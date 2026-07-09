@@ -89,11 +89,11 @@ export default function Navbar() {
         <button
           type="button"
           onClick={() => setMobileOpen((o) => !o)}
-          className="flex h-10 w-10 items-center justify-center rounded border border-[var(--border-subtle)] text-text-primary transition-colors hover:border-accent-ai hover:text-accent-ai focus:outline-none focus:ring-2 focus:ring-accent-ai md:hidden"
+          className="font-mono text-xs uppercase tracking-wider text-text-primary hover:text-accent-ai focus:outline-none md:hidden px-3 h-11 flex items-center justify-center border border-[var(--border-subtle)] rounded transition-colors hover:border-accent-ai focus:ring-2 focus:ring-accent-ai focus:ring-offset-2 focus:ring-offset-bg"
           aria-expanded={mobileOpen}
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
         >
-          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+          {mobileOpen ? "[ CLOSE ]" : "[ MENU ]"}
         </button>
       </nav>
 
@@ -116,7 +116,7 @@ export default function Navbar() {
                 <Link
                   href={href}
                   onClick={() => setMobileOpen(false)}
-                  className={`block py-2.5 font-mono text-sm ${isActive ? "text-accent-ai" : "text-text-secondary"
+                  className={`flex items-center py-3 w-full min-h-[44px] font-mono text-sm ${isActive ? "text-accent-ai" : "text-text-secondary"
                     } hover:text-text-primary`}
                 >
                   {label}

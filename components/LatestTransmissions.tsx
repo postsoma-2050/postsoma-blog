@@ -21,20 +21,20 @@ export default function LatestTransmissions({ latestPosts }: LatestTransmissions
   return (
     <section aria-label="Latest Transmissions" className="mt-8">
       {/* Section header */}
-      <div className="mb-4 flex items-center gap-3">
+      <div className="mb-4 flex flex-wrap items-center gap-x-2 gap-y-1 sm:gap-3">
         <span className="font-mono text-xs font-bold tracking-widest text-cyan-400">
           {"[ >> ]"}
         </span>
-        <h2 className="font-mono text-sm font-bold uppercase tracking-widest text-text-primary">
+        <h2 className="font-mono text-xs sm:text-sm font-bold uppercase tracking-widest text-text-primary">
           LATEST_TRANSMISSIONS
         </h2>
-        <span className="font-mono text-xs text-text-secondary/50">{"// SYS.FEED"}</span>
+        <span className="font-mono text-[11px] sm:text-xs text-text-secondary/50">{"// SYS.FEED"}</span>
         {/* Decorative line */}
-        <div className="flex-1 h-px bg-gradient-to-r from-cyan-400/30 to-transparent" />
+        <div className="flex-1 h-px bg-gradient-to-r from-cyan-400/30 to-transparent hidden sm:block" />
       </div>
 
-      {/* Grid: 2 columns on desktop for primary card, 1 column for secondary list */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      {/* Grid: 2 columns on tablet, 3 on desktop, 1 on mobile */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {/* Primary Latest Post */}
         {primary && (() => {
           const accent = CATEGORY_ACCENTS[primary.category];
@@ -86,7 +86,7 @@ export default function LatestTransmissions({ latestPosts }: LatestTransmissions
               </div>
 
               {/* Bottom CTA */}
-              <div className="relative z-10 mt-4 flex items-center justify-between border-t border-white/5 pt-2">
+              <div className="relative z-10 mt-4 flex items-center justify-between border-t border-white/5 pt-2 min-h-[44px]">
                 <span
                   className="font-mono text-[9px] font-bold uppercase tracking-widest transition-colors"
                   style={{ color: accent }}
@@ -98,8 +98,8 @@ export default function LatestTransmissions({ latestPosts }: LatestTransmissions
           );
         })()}
 
-        {/* Secondary Latest Posts (Stacked stack) */}
-        <div className="md:col-span-1 flex flex-col gap-3.5">
+        {/* Secondary Latest Posts (Stacked list or grid layout) */}
+        <div className="md:col-span-2 lg:col-span-1 grid grid-cols-1 md:grid-cols-2 lg:flex lg:flex-col gap-3.5">
           {secondaries.map((post) => {
             const accent = CATEGORY_ACCENTS[post.category];
             return (
@@ -123,13 +123,13 @@ export default function LatestTransmissions({ latestPosts }: LatestTransmissions
                   </div>
 
                   {/* Title */}
-                  <h4 className="relative z-10 font-mono text-xs font-semibold leading-snug text-text-primary group-hover:text-white transition-colors line-clamp-2">
+                  <h4 className="relative z-10 font-mono text-sm sm:text-base lg:text-xs font-semibold leading-snug text-text-primary group-hover:text-white transition-colors line-clamp-2">
                     {post.name}
                   </h4>
                 </div>
 
                 {/* CTA */}
-                <div className="relative z-10 mt-3 border-t border-white/5 pt-1.5 flex items-center">
+                <div className="relative z-10 mt-3 border-t border-white/5 pt-1.5 flex items-center min-h-[44px]">
                   <span
                     className="font-mono text-[8px] font-bold uppercase tracking-widest"
                     style={{ color: accent }}

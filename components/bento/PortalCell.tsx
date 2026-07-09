@@ -88,14 +88,14 @@ export default function PortalCell() {
                 </div>
 
                 <span
-                    className="font-mono text-xs font-semibold tracking-wide text-cyan-200"
+                    className="w-full md:w-auto h-11 md:h-auto flex md:inline-flex items-center justify-center text-center font-mono text-xs font-semibold tracking-wide text-cyan-200 border border-cyan-500/30 md:border-0 bg-cyan-950/30 md:bg-transparent rounded md:rounded-none mt-3 md:mt-0"
                     style={{
                         textShadow:
                             "0 0 8px rgba(6,182,212,0.4), 0 0 16px rgba(6,182,212,0.2)",
                     }}
                 >
                     Enter Armory{" "}
-                    <span className="text-cyan-400 font-bold ml-0.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200 inline-block">
+                    <span className="text-cyan-400 font-bold ml-1.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200 inline-block">
                         ↗
                     </span>
                 </span>

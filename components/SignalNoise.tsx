@@ -97,7 +97,7 @@ function FeaturedCard({ post }: { post: Post }) {
       </div>
 
       {/* CTA */}
-      <div className="relative z-10 mt-3 flex items-center border-t border-white/5 pt-2">
+      <div className="relative z-10 mt-3 flex items-center border-t border-white/5 pt-2 min-h-[44px]">
         <span
           className="font-mono text-[9px] font-bold uppercase tracking-widest transition-colors"
           style={{ color: accent }}
@@ -147,7 +147,7 @@ function SmallCard({ post }: { post: Post }) {
       </div>
 
       {/* CTA */}
-      <div className="relative z-10 mt-3 border-t border-white/5 pt-1.5">
+      <div className="relative z-10 mt-3 border-t border-white/5 pt-1.5 flex items-center min-h-[44px]">
         <span
           className="font-mono text-[8px] font-bold uppercase tracking-widest"
           style={{ color: accent }}
@@ -202,14 +202,14 @@ export default function SignalNoise({ allPosts, latestSlugs }: SignalNoiseProps)
   return (
     <section aria-label="Signal Noise" className="mt-8">
       {/* Section header */}
-      <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1">
+      <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2">
         <span className="font-mono text-xs font-bold tracking-widest text-text-secondary/60">
           {"[ ? ]"}
         </span>
-        <h2 className="font-mono text-sm font-bold uppercase tracking-widest text-text-primary">
+        <h2 className="font-mono text-xs sm:text-sm font-bold uppercase tracking-widest text-text-primary">
           SIGNAL_NOISE
         </h2>
-        <span className="font-mono text-xs text-text-secondary/50">
+        <span className="font-mono text-[11px] sm:text-xs text-text-secondary/50">
           {`// RNG.SEED:[${seed ?? "..."}]`}
         </span>
         {/* Decorative line */}
@@ -218,7 +218,7 @@ export default function SignalNoise({ allPosts, latestSlugs }: SignalNoiseProps)
         <button
           type="button"
           onClick={reshuffle}
-          className="font-mono text-[10px] font-bold uppercase tracking-widest text-text-secondary/50 hover:text-cyan-400 border border-white/10 hover:border-cyan-400/40 rounded px-2 py-1 transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+          className="w-full md:w-auto h-11 md:h-auto flex md:inline-flex items-center justify-center text-center font-mono text-[10px] font-bold uppercase tracking-widest text-text-secondary/50 hover:text-cyan-400 border border-white/10 hover:border-cyan-400/40 rounded px-3 py-1 md:py-1 transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
         >
           [ RESHUFFLE // NEW SEED ]
         </button>
@@ -232,7 +232,7 @@ export default function SignalNoise({ allPosts, latestSlugs }: SignalNoiseProps)
         </div>
 
         {/* 4 small cards */}
-        <div className="sm:col-span-2 lg:col-span-2 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="sm:col-span-2 lg:col-span-2 grid grid-cols-2 gap-4">
           {rest.map((post) => (
             <SmallCard key={post.slug} post={post} />
           ))}
