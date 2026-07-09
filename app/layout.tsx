@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { JetBrains_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import HudBar from "@/components/HudBar";
 import BodyRouteClass from "@/components/BodyRouteClass";
+import { getPublishedPosts } from "@/lib/notion";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -52,11 +54,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const posts = await getPublishedPosts();
+  const postCount = posts.length;
+
   return (
     <html lang="en" className="dark">
       <body
@@ -64,6 +69,7 @@ export default function RootLayout({
       >
         <BodyRouteClass />
         <Navbar />
+        <HudBar postCount={postCount} />
         <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6">{children}</main>
         <footer className="relative z-10 mt-24 border-t border-white/5 py-12 text-center">
           <div className="flex flex-col items-center space-y-2 font-mono text-sm tracking-wider">

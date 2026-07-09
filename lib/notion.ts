@@ -426,14 +426,11 @@ export async function getPublishedPosts(categorySlug?: string): Promise<Post[]> 
         cursor = response.next_cursor ?? undefined;
       } while (cursor);
 
-      // Featured posts first, then newest first within each group
+      // Sort strictly by published date descending (newest first)
       all.sort((a, b) => {
-        // Featured posts pinned at top
-        if (a.featured !== b.featured) return a.featured ? -1 : 1;
-        // Within group: newest first (descending by Published Date)
-        const da = a.publishedDate ?? "";
-        const db = b.publishedDate ?? "";
-        return db.localeCompare(da);
+        const timeA = a.publishedDate ? new Date(a.publishedDate).getTime() : 0;
+        const timeB = b.publishedDate ? new Date(b.publishedDate).getTime() : 0;
+        return timeB - timeA;
       });
 
       return all;

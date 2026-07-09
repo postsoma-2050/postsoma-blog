@@ -183,8 +183,30 @@ body[data-reading="true"]::before {
 .subcat-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(148, 163, 184, 0.5);
 }
-/* Firefox */
 .subcat-scroll {
   scrollbar-width: thin;
   scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+}
+
+/* ── HUD status bar ticker (mobile) ─────────────────────────────────────── */
+@keyframes hudScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* On small screens, duplicate the items and animate; on md+ stay static */
+.hud-ticker {
+  /* Static by default — content fits on larger screens */
+}
+
+@media (max-width: 767px) {
+  .hud-ticker {
+    /* Enable overflow scroll on touch instead of animation for better UX */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .hud-ticker::-webkit-scrollbar {
+    display: none;
+  }
 }

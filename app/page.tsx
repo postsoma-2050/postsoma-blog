@@ -1,13 +1,9 @@
 
 import Link from "next/link";
 import HeroCell from "@/components/bento/HeroCell";
-import PhilosophyCell from "@/components/bento/PhilosophyCell";
-import BlockchainCell from "@/components/bento/BlockchainCell";
-import AIInsightsCell from "@/components/bento/AIInsightsCell";
-import InvestingCell from "@/components/bento/InvestingCell";
 import PortalCell from "@/components/bento/PortalCell";
-import PortalLibraryCell from "@/components/bento/PortalLibraryCell";
-import PortalSelahCell from "@/components/bento/PortalSelahCell";
+import LatestTransmissions from "@/components/LatestTransmissions";
+import SignalNoise from "@/components/SignalNoise";
 import { getPublishedPosts } from "@/lib/notion";
 
 export const revalidate = 60;
@@ -15,55 +11,55 @@ export const revalidate = 60;
 export default async function HomePage() {
 
   const posts = await getPublishedPosts();
+  
+  // Sort strictly by published date descending (newest first)
+  const sortedPosts = [...posts].sort((a, b) => {
+    const timeA = a.publishedDate ? new Date(a.publishedDate).getTime() : 0;
+    const timeB = b.publishedDate ? new Date(b.publishedDate).getTime() : 0;
+    return timeB - timeA;
+  });
+
+  const latestPosts = sortedPosts.slice(0, 3);
+  const latestSlugs = new Set(latestPosts.map((p) => p.slug));
 
   return (
-    <div className="space-y-8">
-      <section className="border-b border-[var(--border-subtle)] pb-6">
-        <h1 className="font-mono text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl">
-          Dashboard
-        </h1>
-        <p className="mt-2 font-sans text-text-secondary">
-          Technology (left) · Humanity & capital (right). Click a cell to explore.
-        </p>
-      </section>
+    <div className="space-y-0">
+      {/* ── Hero Banner ──────────────────────────────────────────────────── */}
+      <Link
+        href="/sheshin-notes"
+        className="group cursor-pointer block"
+      >
+        <div className="h-full flex flex-col justify-between rounded border border-cyan-400/70 animate-hero-heartbeat">
+          <HeroCell asChild />
+        </div>
+      </Link>
 
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 p-6 md:grid-cols-2">
-        <Link
-          href="/sheshin-notes"
-          className="group cursor-pointer block col-span-1 md:col-span-2"
-        >
-          <div className="h-full flex flex-col justify-between rounded border border-cyan-400/70 animate-hero-heartbeat">
-            <HeroCell asChild />
-          </div>
-        </Link>
-        <div className="col-span-1 h-full">
-          <div className="h-full flex flex-col justify-between">
-            <AIInsightsCell postCount={posts.length} />
-          </div>
-        </div>
-        <div className="col-span-1 h-full">
-          <div className="h-full flex flex-col justify-between">
-            <PhilosophyCell />
-          </div>
-        </div>
-        <div className="col-span-1 h-full">
-          <div className="h-full flex flex-col justify-between">
-            <BlockchainCell />
-          </div>
-        </div>
-        <div className="col-span-1 h-full">
-          <div className="h-full flex flex-col justify-between">
-            <InvestingCell />
-          </div>
-        </div>
-
-        {/* Portals Section */}
-        <div className="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <PortalCell />
-          <PortalLibraryCell />
-          <PortalSelahCell />
-        </div>
+      {/* ── LATEST_TRANSMISSIONS ─────────────────────────────────────────── */}
+      <div className="mt-6">
+        <LatestTransmissions latestPosts={latestPosts} />
       </div>
+
+      {/* ── SIGNAL_NOISE ─────────────────────────────────────────────────── */}
+      <div className="mt-6">
+        <SignalNoise allPosts={posts} latestSlugs={latestSlugs} />
+      </div>
+
+      {/* ── PORTALS ──────────────────────────────────────────────────────── */}
+      <section aria-label="Portals" className="mt-8">
+        <div className="mb-3 flex items-center gap-3">
+          <span className="font-mono text-xs font-bold tracking-widest text-text-secondary/40">
+            {"[ \u2197 ]"}
+          </span>
+          <h2 className="font-mono text-sm font-bold uppercase tracking-widest text-text-primary">
+            PORTALS
+          </h2>
+          <span className="font-mono text-xs text-text-secondary/50">
+            {"// SYS.REDIRECT"}
+          </span>
+          <div className="flex-1 h-px bg-gradient-to-r from-white/8 to-transparent hidden sm:block" />
+        </div>
+        <PortalCell />
+      </section>
     </div>
   );
 }
