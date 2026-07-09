@@ -387,7 +387,7 @@ function TerminalPanel() {
           <span className="mr-2 font-bold select-none">&gt;</span>
           <div>
             <p className="leading-relaxed text-text-primary/95 font-medium">
-              "What has been will be again, what has been done will be done again; there is nothing new under the sun."
+              &quot;What has been will be again, what has been done will be done again; there is nothing new under the sun.&quot;
             </p>
             <p className="mt-1 text-[9px] text-cyan-400/50 uppercase tracking-widest">
               — Ecclesiastes 1:9 // RECURRING_CYCLE
