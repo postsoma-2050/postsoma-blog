@@ -670,7 +670,7 @@ export default function HudBar({ postCount = 0 }: HudBarProps) {
             </button>
           ) : (
             <span className="md:hidden select-none px-2 py-0.5 rounded font-mono text-[10px] leading-none text-text-secondary/50 cursor-default">
-              [->]
+              {"[->]"}
             </span>
           )}
 

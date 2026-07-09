@@ -194,10 +194,6 @@ body[data-reading="true"]::before {
   100% { transform: translateX(-50%); }
 }
 
-/* On small screens, duplicate the items and animate; on md+ stay static */
-.hud-ticker {
-  /* Static by default — content fits on larger screens */
-}
 
 @media (max-width: 767px) {
   .hud-ticker {
