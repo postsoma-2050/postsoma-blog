@@ -160,6 +160,13 @@ type PanelId = "status" | "ticker" | "sentiment" | "terminal" | "mobile-hud" | n
 
 interface HudBarProps {
   postCount?: number;
+  categoryCounts?: {
+    AI: number;
+    BC: number;
+    PH: number;
+    IV: number;
+    NT: number;
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -185,32 +192,65 @@ function PanelBackdrop({ accentClass }: { accentClass: string }) {
 // ---------------------------------------------------------------------------
 // Individual panels (ONLINE status, BTC ticker, FOMO sentiment, terminal)
 // ---------------------------------------------------------------------------
-function StatusPanel({ postCount }: { postCount: number }) {
-  const items = [
-    { status: "ONLINE",  label: "Reasoning Core",     cls: "text-emerald-400" },
-    { status: "SYNCING", label: "Vector Index",        cls: "text-amber-400" },
-    { status: "FAILED",  label: "Turing Test",         cls: "text-red-400" },
-    { status: "OK",      label: `Total Nodes: ${postCount}`, cls: "text-emerald-400" },
-  ];
+function StatusPanel({
+  postCount,
+  categoryCounts,
+}: {
+  postCount: number;
+  categoryCounts?: { AI: number; BC: number; PH: number; IV: number; NT: number };
+}) {
+  const catEntries = categoryCounts
+    ? [
+        { key: "AI", label: "AI Insights",    count: categoryCounts.AI,  href: "/ai-insights" },
+        { key: "BC", label: "Blockchain",      count: categoryCounts.BC,  href: "/blockchain" },
+        { key: "PH", label: "Philosophy",      count: categoryCounts.PH,  href: "/philosophy" },
+        { key: "IV", label: "Investing",       count: categoryCounts.IV,  href: "/investing" },
+        { key: "NT", label: "Sheshin Notes",   count: categoryCounts.NT,  href: "/sheshin-notes" },
+      ]
+    : null;
+
   return (
-    <div className="relative flex flex-col justify-between min-h-[150px] md:h-[160px] h-auto p-4 md:p-5 text-emerald-400 font-mono gap-4 md:gap-0">
+    <div className="relative flex flex-col justify-between min-h-[150px] md:h-auto h-auto p-4 md:p-5 text-emerald-400 font-mono gap-4 md:gap-3">
       <PanelBackdrop accentClass="bg-emerald-500" />
-      
+
       <div>
         <span className="text-[10px] font-semibold uppercase tracking-widest text-emerald-400/60 flex items-center gap-2">
           <span className="h-1 w-1 rounded-full bg-emerald-400 animate-ping" />
           SYSTEM_STATUS // LOGS
         </span>
-        <ul className="mt-2.5 flex flex-col gap-1 text-[11px]">
-          {items.map(({ status, label, cls }) => (
-            <li key={label} className="flex items-center gap-3">
-              <span className={`w-16 shrink-0 font-bold ${cls}`}>
-                [{status}]
-              </span>
-              <span className="text-text-primary/80">{label}</span>
-            </li>
-          ))}
-        </ul>
+
+        {catEntries ? (
+          /* Category breakdown rows */
+          <ul className="mt-2.5 flex flex-col gap-1 text-[11px]">
+            {catEntries.map(({ key, label, count, href }) => (
+              <li key={key} className="flex items-center gap-3">
+                <span className="w-8 shrink-0 font-bold text-emerald-400">{key}</span>
+                <span className="flex-1 text-text-primary/70">{label}</span>
+                <Link
+                  href={href}
+                  className="tabular-nums text-emerald-300 hover:text-emerald-200 transition-colors font-semibold"
+                >
+                  {count} nodes
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          /* Fallback: original static rows */
+          <ul className="mt-2.5 flex flex-col gap-1 text-[11px]">
+            {[
+              { status: "ONLINE",  label: "Reasoning Core",        cls: "text-emerald-400" },
+              { status: "SYNCING", label: "Vector Index",           cls: "text-amber-400" },
+              { status: "FAILED",  label: "Turing Test",            cls: "text-red-400" },
+              { status: "OK",      label: `Total Nodes: ${postCount}`, cls: "text-emerald-400" },
+            ].map(({ status, label, cls }) => (
+              <li key={label} className="flex items-center gap-3">
+                <span className={`w-16 shrink-0 font-bold ${cls}`}>[{status}]</span>
+                <span className="text-text-primary/80">{label}</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       <div className="relative z-10 border-t border-emerald-500/10 pt-2">
@@ -503,7 +543,7 @@ function MobileHudPanel({
 // ---------------------------------------------------------------------------
 // HUD Bar
 // ---------------------------------------------------------------------------
-export default function HudBar({ postCount = 0 }: HudBarProps) {
+export default function HudBar({ postCount = 0, categoryCounts }: HudBarProps) {
   const [activePanel, setActivePanel] = useState<PanelId>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
@@ -717,7 +757,7 @@ export default function HudBar({ postCount = 0 }: HudBarProps) {
           aria-label="HUD detail panel"
         >
           <div className="mx-auto max-w-6xl">
-            {activePanel === "status"    && <StatusPanel postCount={postCount} />}
+            {activePanel === "status"    && <StatusPanel postCount={postCount} categoryCounts={categoryCounts} />}
             {activePanel === "ticker"    && <TickerPanel prices={prices} />}
             {activePanel === "sentiment" && <SentimentPanel fomo={fomo} />}
             {activePanel === "terminal"  && <TerminalPanel />}

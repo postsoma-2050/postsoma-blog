@@ -678,3 +678,31 @@ export function estimateReadingTimeFromBlocks(blocks: NotionBlock[]): number {
   return estimateReadingTimeFromString(text);
 }
 
+/**
+ * Returns article counts grouped by our 5 display categories.
+ * Reuses the cached getPublishedPosts("all") result — zero extra API calls.
+ *
+ * Returned shape maps our short display labels to counts:
+ *   { AI: 42, BC: 18, PH: 27, IV: 35, NT: 89 }
+ */
+export async function getArticleCountByCategory(): Promise<{
+  AI: number;
+  BC: number;
+  PH: number;
+  IV: number;
+  NT: number;
+}> {
+  const posts = await getPublishedPosts(); // already cached
+
+  const counts = { AI: 0, BC: 0, PH: 0, IV: 0, NT: 0 };
+  for (const post of posts) {
+    switch (post.category) {
+      case "AI Insights":    counts.AI++; break;
+      case "Blockchain":     counts.BC++; break;
+      case "Philosophy":     counts.PH++; break;
+      case "Investing":      counts.IV++; break;
+      case "Sheshin Notes":  counts.NT++; break;
+    }
+  }
+  return counts;
+}

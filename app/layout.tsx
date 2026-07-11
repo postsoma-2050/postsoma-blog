@@ -4,7 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import HudBar from "@/components/HudBar";
 import BodyRouteClass from "@/components/BodyRouteClass";
-import { getPublishedPosts } from "@/lib/notion";
+import { getPublishedPosts, getArticleCountByCategory } from "@/lib/notion";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -59,7 +59,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const posts = await getPublishedPosts();
+  const [posts, categoryCounts] = await Promise.all([
+    getPublishedPosts(),
+    getArticleCountByCategory(),
+  ]);
   const postCount = posts.length;
 
   return (
@@ -69,7 +72,7 @@ export default async function RootLayout({
       >
         <BodyRouteClass />
         <Navbar />
-        <HudBar postCount={postCount} />
+        <HudBar postCount={postCount} categoryCounts={categoryCounts} />
         <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6">{children}</main>
         <footer className="relative z-10 mt-24 border-t border-white/5 py-12 text-center">
           <div className="flex flex-col items-center space-y-2 font-mono text-sm tracking-wider">
