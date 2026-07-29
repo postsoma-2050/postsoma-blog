@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import PostCard from "./PostCard";
 import type { Post } from "@/lib/posts";
+import { RiCompass3Line } from "@remixicon/react";
 
 type FurtherReadSectionProps = {
   initialRelatedPosts: Post[];
@@ -70,7 +71,7 @@ export default function FurtherReadSection({
         className="font-mono text-lg font-bold tracking-widest uppercase flex items-center gap-2"
         style={{ color: accent }}
       >
-        <span className="h-1.5 w-1.5 rounded-full bg-current" />
+        <RiCompass3Line className="w-5 h-5" />
         Further Read // 延伸閱讀
       </h3>
       <div className="mt-6 grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-3">

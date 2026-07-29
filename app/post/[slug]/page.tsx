@@ -1,8 +1,7 @@
-
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
+import { RiTimerLine, RiMusic2Line, RiAttachment2, RiArrowLeftLine } from "@remixicon/react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
@@ -86,7 +85,6 @@ function getHeadingsFromMarkdown(markdown: string) {
   });
 }
 
-// Transform literal <u>...</u> to styled spans before markdown parsing
 function preprocessUnderlineTags(md: string): string {
   return md.replace(
     /<u>([\s\S]*?)<\/u>/gi,
@@ -105,7 +103,6 @@ export default async function PostPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-
   const { slug } = await params;
   const post = await getPostBySlug(slug);
   if (!post) notFound();
@@ -128,18 +125,80 @@ export default async function PostPage({
   const accent = CATEGORY_ACCENTS[post.category];
   const categorySlug = CATEGORY_SLUGS[post.category];
 
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BlogPosting",
+        "@id": `${SITE_URL}/post/${post.slug}#article`,
+        "url": `${SITE_URL}/post/${post.slug}`,
+        "headline": post.name,
+        "description": post.summary ?? `Read "${post.name}" on PostSoma 2050.`,
+        "datePublished": post.publishedDate ?? undefined,
+        "keywords": post.tags.length > 0 ? post.tags.join(", ") : undefined,
+        "author": {
+          "@type": "Person",
+          "name": "postsoma-2050",
+          "url": `${SITE_URL}/about`
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "PostSoma 2050",
+          "url": SITE_URL,
+          "logo": {
+            "@type": "ImageObject",
+            "url": `${SITE_URL}/logo.png`
+          }
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": `${SITE_URL}/post/${post.slug}`
+        },
+        "image": post.media.find((m) => m.kind === "image")?.url ?? `${SITE_URL}/no-future.jpg`
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": SITE_URL
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": post.category,
+            "item": `${SITE_URL}/${categorySlug}`
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": post.name,
+            "item": `${SITE_URL}/post/${post.slug}`
+          }
+        ]
+      }
+    ]
+  };
+
   return (
     <div className="min-h-screen pb-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
       <TableOfContents headings={headings} />
 
       <div className="mx-auto max-w-4xl px-0 sm:px-6 pt-6 sm:pt-12">
         <header className="mb-12 text-center">
           <Link
             href={`/${categorySlug}`}
-            className="font-mono text-sm text-text-secondary hover:text-text-primary"
+            className="inline-flex items-center font-mono text-sm text-text-secondary hover:text-text-primary transition-colors"
             style={{ color: accent }}
           >
-            ← {post.category}
+            <RiArrowLeftLine className="w-4 h-4 mr-1" />
+            {post.category}
           </Link>
           <h1 className="mt-4 font-mono text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl">
             {post.name}
@@ -147,7 +206,10 @@ export default async function PostPage({
           <div className="mt-2 flex flex-wrap items-center justify-center gap-2 font-mono text-sm text-text-secondary">
             {post.publishedDate && <time>{post.publishedDate}</time>}
             <span>·</span>
-            <span>⏱️ {readingTime} min read / {readingTime} 分鐘</span>
+            <span className="inline-flex items-center gap-1">
+              <RiTimerLine className="w-4 h-4 text-cyan-400" />
+              {readingTime} min read / {readingTime} 分鐘
+            </span>
             {post.tags.length > 0 && (
               <>
                 <span>·</span>
@@ -159,7 +221,7 @@ export default async function PostPage({
           </div>
         </header>
 
-        {/* Media section — renders images, videos, and audio from Notion Media property */}
+        {/* Media section */}
         {post.media.length > 0 && (
           <section className="mb-10 mt-2 space-y-5">
             {post.media.map((item, idx) => {
@@ -212,8 +274,9 @@ export default async function PostPage({
                     }}
                   >
                     {item.name && (
-                      <p className="mb-2 font-mono text-xs text-text-secondary">
-                        🎵 {item.name}
+                      <p className="mb-2 font-mono text-xs text-text-secondary flex items-center gap-1.5">
+                        <RiMusic2Line className="w-3.5 h-3.5 text-cyan-400" />
+                        <span>{item.name}</span>
                       </p>
                     )}
                     <audio src={item.url} controls preload="metadata" className="w-full">
@@ -222,7 +285,6 @@ export default async function PostPage({
                   </div>
                 );
               }
-              // kind === "other" — render a download link
               return (
                 <a
                   key={idx}
@@ -235,7 +297,8 @@ export default async function PostPage({
                     background: "rgba(255,255,255,0.03)",
                   }}
                 >
-                  📎 {item.name ?? "Download file"}
+                  <RiAttachment2 className="w-4 h-4 text-cyan-400" />
+                  <span>{item.name ?? "Download file"}</span>
                 </a>
               );
             })}

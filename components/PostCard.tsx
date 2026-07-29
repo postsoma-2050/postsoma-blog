@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { RiArrowRightLine } from "@remixicon/react";
 import type { Post } from "@/lib/posts";
 import { CATEGORY_ACCENTS, type Category } from "@/lib/design-tokens";
 
@@ -135,9 +135,8 @@ export default function PostCard({
             >
               {post.name}
             </h2>
-            <ArrowRight 
-              size={16} 
-              className="mt-0.5 shrink-0 text-text-secondary/40 transition-all duration-300 group-hover:translate-x-1.5 group-hover:text-[var(--hover-color)]"
+            <RiArrowRightLine 
+              className="w-4 h-4 mt-0.5 shrink-0 text-text-secondary/40 transition-all duration-300 group-hover:translate-x-1.5 group-hover:text-[var(--hover-color)]"
               style={{ "--hover-color": color } as React.CSSProperties}
             />
           </div>

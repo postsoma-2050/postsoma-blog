@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { RiMenu3Line, RiCloseLine } from "@remixicon/react";
 import { useState } from "react";
 import { CATEGORY_SLUGS, type Category } from "@/lib/design-tokens";
 
@@ -13,6 +13,7 @@ const navLinks: { label: string; href: string }[] = [
   ...(Object.entries(CATEGORY_SLUGS) as [Category, string][]).map(
     ([label, slug]) => ({ label, href: `/${slug}` })
   ),
+  { label: "About", href: "/about" },
 ];
 
 export default function Navbar() {
@@ -93,7 +94,7 @@ export default function Navbar() {
           aria-expanded={mobileOpen}
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
         >
-          {mobileOpen ? "[ CLOSE ]" : "[ MENU ]"}
+          {mobileOpen ? <RiCloseLine className="w-5 h-5" /> : <RiMenu3Line className="w-5 h-5" />}
         </button>
       </nav>
 

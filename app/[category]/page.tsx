@@ -1,4 +1,3 @@
-
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import {
@@ -65,41 +64,85 @@ export default async function CategoryPage({
 }: {
   params: Promise<{ category: string }>;
 }) {
-
   const { category: categorySlug } = await params;
   const category = getCategoryBySlug(categorySlug);
   if (!category) notFound();
 
   const posts = await getPostsByCategory(categorySlug);
-  const title = category; // Category type is the display name (e.g. "AI Insights")
+  const title = category;
 
-  if (categorySlug === "blockchain") {
+  const categoryJsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        "@id": `${SITE_URL}/${categorySlug}#collection`,
+        "url": `${SITE_URL}/${categorySlug}`,
+        "name": `${title} | PostSoma 2050`,
+        "description": CATEGORY_DESCRIPTIONS[category],
+        "isPartOf": {
+          "@id": `${SITE_URL}/#website`
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": SITE_URL
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": title,
+            "item": `${SITE_URL}/${categorySlug}`
+          }
+        ]
+      }
+    ]
+  };
+
+  const renderContent = () => {
+    if (categorySlug === "blockchain") {
+      return (
+        <div className="mx-auto max-w-7xl px-0 sm:px-6 py-6 sm:py-12">
+          <DocLayout title={title} category={category} posts={posts} />
+        </div>
+      );
+    }
+
+    if (categorySlug === "philosophy") {
+      return (
+        <div className="mx-auto max-w-4xl px-0 sm:px-6 py-6 sm:py-12">
+          <ManifestoLayout title={title} category={category} posts={posts} />
+        </div>
+      );
+    }
+
+    if (categorySlug === "sheshin-notes") {
+      return (
+        <div className="mx-auto max-w-3xl px-0 sm:px-6 py-6 sm:py-12">
+          <ListLayout title={title} category={category} posts={posts} />
+        </div>
+      );
+    }
+
     return (
       <div className="mx-auto max-w-7xl px-0 sm:px-6 py-6 sm:py-12">
-        <DocLayout title={title} category={category} posts={posts} />
+        <GridLayout title={title} category={category} posts={posts} />
       </div>
     );
-  }
-
-  if (categorySlug === "philosophy") {
-    return (
-      <div className="mx-auto max-w-4xl px-0 sm:px-6 py-6 sm:py-12">
-        <ManifestoLayout title={title} category={category} posts={posts} />
-      </div>
-    );
-  }
-
-  if (categorySlug === "sheshin-notes") {
-    return (
-      <div className="mx-auto max-w-3xl px-0 sm:px-6 py-6 sm:py-12">
-        <ListLayout title={title} category={category} posts={posts} />
-      </div>
-    );
-  }
+  };
 
   return (
-    <div className="mx-auto max-w-7xl px-0 sm:px-6 py-6 sm:py-12">
-      <GridLayout title={title} category={category} posts={posts} />
-    </div>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(categoryJsonLd) }}
+      />
+      {renderContent()}
+    </>
   );
 }

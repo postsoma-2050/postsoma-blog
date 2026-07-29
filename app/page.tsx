@@ -1,4 +1,3 @@
-
 import Link from "next/link";
 import HeroCell from "@/components/bento/HeroCell";
 import PortalCell from "@/components/bento/PortalCell";
@@ -8,8 +7,29 @@ import { getPublishedPosts } from "@/lib/notion";
 
 export const revalidate = 60;
 
-export default async function HomePage() {
+const homeJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "@id": "https://www.postsoma-2050.com/#blog",
+  "name": "PostSoma 2050",
+  "url": "https://www.postsoma-2050.com",
+  "description": "Cyberpunk-Humanist Knowledge Garden. High-Tech meets High-Touch. AI, Blockchain, Philosophy, Investing, Notes.",
+  "publisher": {
+    "@type": "Organization",
+    "name": "PostSoma 2050",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.postsoma-2050.com/logo.png"
+    }
+  },
+  "author": {
+    "@type": "Person",
+    "name": "postsoma-2050",
+    "url": "https://www.postsoma-2050.com/about"
+  }
+};
 
+export default async function HomePage() {
   const posts = await getPublishedPosts();
   
   // Sort strictly by published date descending (newest first)
@@ -24,6 +44,11 @@ export default async function HomePage() {
 
   return (
     <div className="space-y-0">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(homeJsonLd) }}
+      />
+
       {/* ── Hero Banner ──────────────────────────────────────────────────── */}
       <Link
         href="/sheshin-notes"

@@ -1,6 +1,6 @@
 "use client";
 
-import { Cpu, Sparkles, AlertCircle, Compass, AlignLeft } from "lucide-react";
+import { RiCpuLine, RiFlashlightLine, RiNodeTree, RiCompass3Line, RiAlignLeft } from "@remixicon/react";
 
 interface AISummaryData {
   keyTakeaway?: string;
@@ -23,11 +23,9 @@ export default function AICard({ rawSummary, readingTime }: AICardProps) {
   let isJson = false;
 
   try {
-    // Try to parse the JSON string from Notion
     data = JSON.parse(rawSummary);
     isJson = typeof data === "object" && data !== null;
   } catch (e) {
-    // Not a JSON string, treat as plain text summary
     isJson = false;
   }
 
@@ -59,13 +57,13 @@ export default function AICard({ rawSummary, readingTime }: AICardProps) {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-ai"></span>
             </span>
             <span className="font-mono text-xs uppercase tracking-widest text-accent-ai flex items-center gap-1.5">
-              <Cpu size={14} className="animate-pulse" />
+              <RiCpuLine className="w-4 h-4 animate-pulse" />
               AI Quantum Insights // 智能導讀
             </span>
           </div>
           {guide && (
-            <div className="flex items-center gap-1.5 font-mono text-[11px] text-text-secondary bg-white/5 px-2 py-0.5 rounded border border-white/5">
-              <Compass size={11} className="text-accent-philosophy" />
+            <div className="flex items-center gap-1.5 font-mono text-[11px] text-text-secondary bg-white/5 px-2.5 py-1 rounded border border-white/5">
+              <RiCompass3Line className="w-3.5 h-3.5 text-accent-philosophy" />
               <span>{guide}</span>
             </div>
           )}
@@ -75,7 +73,7 @@ export default function AICard({ rawSummary, readingTime }: AICardProps) {
         {takeaway && (
           <div className="space-y-2">
             <h4 className="font-mono text-xs font-semibold uppercase tracking-wider text-text-primary/75 flex items-center gap-1.5">
-              <Sparkles size={12} className="text-accent-ai" />
+              <RiFlashlightLine className="w-3.5 h-3.5 text-accent-ai" />
               Core Takeaway / 核心提煉
             </h4>
             <p className="font-sans text-[15px] leading-relaxed text-text-primary pl-4 border-l border-accent-ai/30">
@@ -88,7 +86,7 @@ export default function AICard({ rawSummary, readingTime }: AICardProps) {
         {points && points.length > 0 && (
           <div className="mt-5 space-y-3">
             <h4 className="font-mono text-xs font-semibold uppercase tracking-wider text-text-primary/75 flex items-center gap-1.5">
-              <AlertCircle size={12} className="text-accent-philosophy" />
+              <RiNodeTree className="w-3.5 h-3.5 text-accent-philosophy" />
               Thought Nodes / 思維要點
             </h4>
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-4">
@@ -108,7 +106,7 @@ export default function AICard({ rawSummary, readingTime }: AICardProps) {
     );
   }
 
-  // 2. Plain Text Summary Rendering (Fallback for existing articles)
+  // 2. Plain Text Summary Rendering
   return (
     <section 
       className="relative mb-10 overflow-hidden rounded border border-accent-ai/20 bg-neutral-900/40 p-4 sm:p-5 backdrop-blur-sm transition-all duration-300 hover:border-accent-ai/35"
@@ -125,13 +123,13 @@ export default function AICard({ rawSummary, readingTime }: AICardProps) {
             <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-accent-ai/60"></span>
           </span>
           <span className="font-mono text-xs uppercase tracking-widest text-accent-ai/80 flex items-center gap-1.5">
-            <AlignLeft size={13} />
+            <RiAlignLeft className="w-3.5 h-3.5" />
             Executive Summary // 內容大綱
           </span>
         </div>
         {readingTime && (
           <div className="flex items-center gap-1.5 font-mono text-[11px] text-text-secondary bg-white/5 px-2 py-0.5 rounded border border-white/5">
-            <Compass size={11} className="text-accent-philosophy" />
+            <RiCompass3Line className="w-3 h-3 text-accent-philosophy" />
             <span>預計閱讀 {readingTime} 分鐘</span>
           </div>
         )}
