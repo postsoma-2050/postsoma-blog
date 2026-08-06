@@ -34,17 +34,27 @@ export default function Navbar() {
         {/* Logo */}
         <Link
           href="/"
-          className="transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-accent-ai focus:ring-offset-2 focus:ring-offset-bg"
-          aria-label="PostSoma home"
+          className="group flex items-center gap-3 transition-all focus:outline-none focus:ring-2 focus:ring-accent-ai focus:ring-offset-2 focus:ring-offset-bg"
+          aria-label="PostSoma 2050 home"
         >
-          <Image
-            src="/logo.png"
-            alt="PostSoma 2050"
-            width={160}
-            height={40}
-            className="h-10 w-auto sm:h-12"
-            priority
-          />
+          <div className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg border border-cyan-500/30 bg-bg-secondary p-1 shadow-[0_0_12px_rgba(0,240,255,0.25)] transition-all duration-300 group-hover:border-cyan-400 group-hover:shadow-[0_0_18px_rgba(0,240,255,0.5)]">
+            <Image
+              src="/logo.png"
+              alt="PostSoma Icon"
+              width={36}
+              height={36}
+              className="h-full w-full object-contain"
+              priority
+            />
+          </div>
+          <div className="flex items-center">
+            <span className="font-mono text-base font-bold tracking-widest text-text-primary transition-colors group-hover:text-cyan-300 sm:text-lg">
+              POST<span className="text-cyan-400">SOMA</span>
+            </span>
+            <span className="ml-2 font-mono text-[10px] font-semibold tracking-wider text-cyan-400 border border-cyan-500/40 bg-cyan-950/60 px-1.5 py-0.5 rounded shadow-[0_0_8px_rgba(0,240,255,0.2)] sm:text-xs">
+              2050
+            </span>
+          </div>
         </Link>
 
         {/* Desktop nav */}

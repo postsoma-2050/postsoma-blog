@@ -27,8 +27,13 @@ export const metadata: Metadata = {
   description:
     "High-Tech meets High-Touch. AI, Blockchain, Philosophy, Investing, Notes.",
   icons: {
-    icon: "/favicon.png",
-    apple: "/favicon.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.png", type: "image/png", sizes: "192x192" },
+    ],
+    apple: [
+      { url: "/favicon.png", sizes: "192x192", type: "image/png" },
+    ],
   },
   openGraph: {
     type: "website",
