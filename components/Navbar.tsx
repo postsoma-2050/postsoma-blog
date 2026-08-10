@@ -37,12 +37,12 @@ export default function Navbar() {
           className="group flex items-center gap-3 transition-all focus:outline-none focus:ring-2 focus:ring-accent-ai focus:ring-offset-2 focus:ring-offset-bg"
           aria-label="PostSoma 2050 home"
         >
-          <div className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg border border-cyan-500/30 bg-bg-secondary p-1 shadow-[0_0_12px_rgba(0,240,255,0.25)] transition-all duration-300 group-hover:border-cyan-400 group-hover:shadow-[0_0_18px_rgba(0,240,255,0.5)]">
+          <div className="relative flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center overflow-hidden rounded-lg border border-cyan-500/30 bg-bg-secondary p-0.5 shadow-[0_0_12px_rgba(0,240,255,0.25)] transition-all duration-300 group-hover:border-cyan-400 group-hover:shadow-[0_0_18px_rgba(0,240,255,0.5)]">
             <Image
               src="/logo.png"
               alt="PostSoma Icon"
-              width={36}
-              height={36}
+              width={44}
+              height={44}
               className="h-full w-full object-contain"
               priority
             />
