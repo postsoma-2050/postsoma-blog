@@ -30,7 +30,18 @@ class ConcurrencyQueue {
   }
 }
 
-const notionQueue = new ConcurrencyQueue(2);
+const notionQueue = new ConcurrencyQueue(1);
+let lastNotionCallTimestamp = 0;
+const MIN_NOTION_INTERVAL = 340; // Respect Notion API 3 req/sec limit (~334ms)
+
+async function paceNotionRequest() {
+  const now = Date.now();
+  const elapsed = now - lastNotionCallTimestamp;
+  if (elapsed < MIN_NOTION_INTERVAL) {
+    await new Promise((resolve) => setTimeout(resolve, MIN_NOTION_INTERVAL - elapsed));
+  }
+  lastNotionCallTimestamp = Date.now();
+}
 
 async function withRetry<T>(
   fn: () => Promise<T>,
@@ -38,6 +49,7 @@ async function withRetry<T>(
   delay = 1000
 ): Promise<T> {
   try {
+    await paceNotionRequest();
     return await fn();
   } catch (err: any) {
     const isRateLimit = err.status === 429 || err.code === "rate_limited";
