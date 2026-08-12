@@ -70,7 +70,8 @@ export async function generateMetadata({
   };
 }
 
-export const revalidate = 60;
+export const revalidate = 3600; // Re-validate each post page at most once per hour
+export const dynamicParams = true; // Allow on-demand ISR for slugs not pre-built
 
 function getHeadingsFromMarkdown(markdown: string) {
   const headingLines = markdown.match(/^(#{1,3})\s+(.*)$/gm) || [];
@@ -92,10 +93,11 @@ function preprocessUnderlineTags(md: string): string {
   );
 }
 
+// Return empty array: skip pre-rendering all posts at build time.
+// Pages are rendered on-demand (ISR) when first visited, then cached for `revalidate` seconds.
+// This avoids hammering the Notion API with 280+ concurrent requests during Vercel SSG builds.
 export async function generateStaticParams() {
-  const { getPosts } = await import("@/lib/posts");
-  const posts = await getPosts();
-  return posts.map((p) => ({ slug: p.slug }));
+  return [];
 }
 
 export default async function PostPage({
