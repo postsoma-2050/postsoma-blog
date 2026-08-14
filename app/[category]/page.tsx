@@ -107,7 +107,7 @@ export default async function CategoryPage({
   const renderContent = () => {
     if (categorySlug === "blockchain") {
       return (
-        <div className="mx-auto max-w-7xl px-0 sm:px-6 py-6 sm:py-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-12">
           <DocLayout title={title} category={category} posts={posts} />
         </div>
       );
@@ -115,7 +115,7 @@ export default async function CategoryPage({
 
     if (categorySlug === "philosophy") {
       return (
-        <div className="mx-auto max-w-4xl px-0 sm:px-6 py-6 sm:py-12">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 py-6 sm:py-12">
           <ManifestoLayout title={title} category={category} posts={posts} />
         </div>
       );
@@ -123,14 +123,14 @@ export default async function CategoryPage({
 
     if (categorySlug === "sheshin-notes") {
       return (
-        <div className="mx-auto max-w-3xl px-0 sm:px-6 py-6 sm:py-12">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 py-6 sm:py-12">
           <ListLayout title={title} category={category} posts={posts} />
         </div>
       );
     }
 
     return (
-      <div className="mx-auto max-w-7xl px-0 sm:px-6 py-6 sm:py-12">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-12">
         <GridLayout title={title} category={category} posts={posts} />
       </div>
     );

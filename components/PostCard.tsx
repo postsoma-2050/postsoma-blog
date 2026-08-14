@@ -36,7 +36,7 @@ export default function PostCard({
         <motion.article
           whileHover={{ x: 2 }}
           whileTap={{ scale: 0.99 }}
-          className="group rounded border-l-2 border-[var(--border-subtle)] bg-neutral-900/80 py-2 pl-3 pr-2 font-sans text-sm text-text-secondary transition-colors hover:text-text-primary"
+          className="group rounded border-l-2 border-[var(--border-subtle)] bg-neutral-900/80 py-2 sm:py-3 pl-3 sm:pl-4 pr-2 sm:pr-3 font-sans text-sm text-text-secondary transition-colors hover:text-text-primary"
           style={{
             borderLeftColor: color,
             boxShadow: `0 0 16px -4px ${hexToRgba(color, 0.25)}`,

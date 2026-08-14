@@ -58,7 +58,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop nav */}
-        <ul className="hidden items-center gap-1 md:flex">
+        <ul className="hidden items-center gap-1 lg:flex">
           {navLinks.map(({ label, href }) => {
             const isActive =
               href === "/"
@@ -100,7 +100,7 @@ export default function Navbar() {
         <button
           type="button"
           onClick={() => setMobileOpen((o) => !o)}
-          className="font-mono text-xs uppercase tracking-wider text-text-primary hover:text-accent-ai focus:outline-none md:hidden px-3 h-11 flex items-center justify-center border border-[var(--border-subtle)] rounded transition-colors hover:border-accent-ai focus:ring-2 focus:ring-accent-ai focus:ring-offset-2 focus:ring-offset-bg"
+          className="font-mono text-xs uppercase tracking-wider text-text-primary hover:text-accent-ai focus:outline-none lg:hidden px-3 h-11 flex items-center justify-center border border-[var(--border-subtle)] rounded transition-colors hover:border-accent-ai focus:ring-2 focus:ring-accent-ai focus:ring-offset-2 focus:ring-offset-bg"
           aria-expanded={mobileOpen}
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
         >
@@ -116,7 +116,7 @@ export default function Navbar() {
           opacity: mobileOpen ? 1 : 0,
         }}
         transition={{ duration: 0.2 }}
-        className="overflow-hidden border-t border-[var(--border-subtle)] md:hidden"
+        className="overflow-hidden border-t border-[var(--border-subtle)] lg:hidden"
       >
         <ul className="flex flex-col gap-0 px-4 py-3">
           {navLinks.map(({ label, href }) => {

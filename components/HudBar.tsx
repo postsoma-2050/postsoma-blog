@@ -637,7 +637,7 @@ export default function HudBar({ postCount = 0, categoryCounts }: HudBarProps) {
             </span>
           )}
 
-          <span className="mx-1.5 text-white/10 select-none hidden md:inline">│</span>
+          <span className="mx-1.5 text-white/10 select-none hidden sm:inline">│</span>
 
           {/* NODES */}
           {isHome ? (
@@ -646,17 +646,17 @@ export default function HudBar({ postCount = 0, categoryCounts }: HudBarProps) {
               aria-label="System Status panel"
               aria-expanded={activePanel === "status"}
               onClick={() => toggle("status")}
-              className={`${segmentCls("status", "text-emerald-400")} hidden md:inline-flex`}
+              className={`${segmentCls("status", "text-emerald-400")} hidden sm:inline-flex`}
             >
               NODES:&nbsp;{postCount}
             </button>
           ) : (
-            <span className={`${segmentCls("status", "text-emerald-400")} hidden md:inline`}>
+            <span className={`${segmentCls("status", "text-emerald-400")} hidden sm:inline`}>
               NODES:&nbsp;{postCount}
             </span>
           )}
 
-          <span className="mx-1.5 text-white/10 select-none hidden md:inline">│</span>
+          <span className="mx-1.5 text-white/10 select-none hidden sm:inline">│</span>
 
           {/* BTC */}
           {isHome ? (
@@ -665,18 +665,18 @@ export default function HudBar({ postCount = 0, categoryCounts }: HudBarProps) {
               aria-label="Ticker panel"
               aria-expanded={activePanel === "ticker"}
               onClick={() => toggle("ticker")}
-              className={`${segmentCls("ticker", "text-orange-400")} hidden md:inline-flex`}
+              className={`${segmentCls("ticker", "text-orange-400")} hidden sm:inline-flex`}
             >
               BTC:&nbsp;{btcLabel}
               <span className="ml-0.5 text-[8px] opacity-25">▾</span>
             </button>
           ) : (
-            <span className={`${segmentCls("ticker", "text-orange-400")} hidden md:inline`}>
+            <span className={`${segmentCls("ticker", "text-orange-400")} hidden sm:inline`}>
               BTC:&nbsp;{btcLabel}
             </span>
           )}
 
-          <span className="mx-1.5 text-white/10 select-none hidden md:inline">│</span>
+          <span className="mx-1.5 text-white/10 select-none hidden sm:inline">│</span>
 
           {/* FOMO */}
           {isHome ? (
@@ -695,7 +695,7 @@ export default function HudBar({ postCount = 0, categoryCounts }: HudBarProps) {
             </span>
           )}
 
-          <span className="mx-1.5 text-white/10 select-none md:hidden lg:inline">│</span>
+          <span className="mx-1.5 text-white/10 select-none lg:hidden xl:inline">│</span>
 
           {/* [->] Mobile expand button */}
           {isHome ? (
@@ -704,12 +704,12 @@ export default function HudBar({ postCount = 0, categoryCounts }: HudBarProps) {
               aria-label="Expand HUD panel"
               aria-expanded={activePanel === "mobile-hud"}
               onClick={() => toggle("mobile-hud")}
-              className="md:hidden select-none px-2 py-0.5 rounded font-mono text-[10px] leading-none text-orange-400 hover:text-orange-300 focus:outline-none"
+              className="lg:hidden select-none px-2 py-0.5 rounded font-mono text-[10px] leading-none text-orange-400 hover:text-orange-300 focus:outline-none"
             >
               {activePanel === "mobile-hud" ? "[<-]" : "[->]"}
             </button>
           ) : (
-            <span className="md:hidden select-none px-2 py-0.5 rounded font-mono text-[10px] leading-none text-text-secondary/50 cursor-default">
+            <span className="lg:hidden select-none px-2 py-0.5 rounded font-mono text-[10px] leading-none text-text-secondary/50 cursor-default">
               {"[->]"}
             </span>
           )}
