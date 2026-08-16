@@ -3,6 +3,7 @@ import { JetBrains_Mono, Inter } from "next/font/google";
 import Link from "next/link";
 import Script from "next/script";
 import "./globals.css";
+import "katex/dist/katex.min.css";
 import Navbar from "@/components/Navbar";
 import HudBar from "@/components/HudBar";
 import BodyRouteClass from "@/components/BodyRouteClass";

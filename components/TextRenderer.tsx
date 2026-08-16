@@ -1,5 +1,6 @@
 "use client";
 
+import katex from "katex";
 import type { NotionRichText } from "@/lib/notion";
 
 const NOTION_COLOR_TO_CLASS: Record<string, string> = {
@@ -19,16 +20,86 @@ type TextRendererProps = {
   richText: NotionRichText[];
 };
 
+function renderContentWithMath(content: string, isEquation: boolean): React.ReactNode {
+  if (!content) return null;
+
+  if (isEquation) {
+    try {
+      const html = katex.renderToString(content, {
+        throwOnError: false,
+        displayMode: false,
+      });
+      return <span className="inline-katex" dangerouslySetInnerHTML={{ __html: html }} />;
+    } catch {
+      return <span>{content}</span>;
+    }
+  }
+
+  if (content.includes("$")) {
+    const parts = content.split(/(\$\$[\s\S]+?\$\$|\$[^\$]+\$)/g);
+    if (parts.length > 1) {
+      return (
+        <>
+          {parts.map((part, idx) => {
+            if (part.startsWith("$$") && part.endsWith("$$") && part.length > 4) {
+              const expr = part.slice(2, -2);
+              try {
+                const html = katex.renderToString(expr, {
+                  throwOnError: false,
+                  displayMode: true,
+                });
+                return (
+                  <span
+                    key={idx}
+                    className="block-katex my-2 text-center"
+                    dangerouslySetInnerHTML={{ __html: html }}
+                  />
+                );
+              } catch {
+                return <span key={idx}>{part}</span>;
+              }
+            } else if (part.startsWith("$") && part.endsWith("$") && part.length > 2) {
+              const expr = part.slice(1, -1);
+              try {
+                const html = katex.renderToString(expr, {
+                  throwOnError: false,
+                  displayMode: false,
+                });
+                return (
+                  <span
+                    key={idx}
+                    className="inline-katex"
+                    dangerouslySetInnerHTML={{ __html: html }}
+                  />
+                );
+              } catch {
+                return <span key={idx}>{part}</span>;
+              }
+            }
+            return <span key={idx}>{part}</span>;
+          })}
+        </>
+      );
+    }
+  }
+
+  return content;
+}
+
 /**
  * Renders Notion rich_text array with Cyberpunk theme:
  * Bold = white, Code = pink + dark bg, Underline = border (no <u>), Links = cyan + hover glow.
+ * Math equations = KaTeX rendered HTML.
  */
 export default function TextRenderer({ richText }: TextRendererProps) {
   if (!Array.isArray(richText) || richText.length === 0) return null;
 
   // Filter out standalone tag items (e.g. when Notion splits <u> and </u> into separate items)
   const filteredRichText = richText.filter((r) => {
-    const content = (r.text?.content ?? "").trim();
+    const isEquation = r.type === "equation" || Boolean(r.equation);
+    const content = isEquation
+      ? (r.equation?.expression ?? "").trim()
+      : (r.text?.content ?? "").trim();
     return !/^<\/?u>$/i.test(content);
   });
 
@@ -37,10 +108,12 @@ export default function TextRenderer({ richText }: TextRendererProps) {
   return (
     <>
       {filteredRichText.map((r, i) => {
-        const rawContent = r.text?.content ?? "";
-        // Strip literal HTML <u>/</u> (e.g. pasted or imported) so we never show raw tags;
-        // treat stripped content as underline so our border-b style is applied.
-        const hadLiteralUnderline = /<u>|<\/u>/i.test(rawContent);
+        const isEquation = r.type === "equation" || Boolean(r.equation);
+        const rawContent = isEquation
+          ? r.equation?.expression ?? ""
+          : r.text?.content ?? "";
+
+        const hadLiteralUnderline = !isEquation && /<u>|<\/u>/i.test(rawContent);
         const content = hadLiteralUnderline
           ? rawContent.replace(/<\/?u>/gi, "").trim()
           : rawContent;
@@ -51,7 +124,7 @@ export default function TextRenderer({ richText }: TextRendererProps) {
             ? NOTION_COLOR_TO_CLASS[ann.color] ?? ""
             : "";
 
-        let node: React.ReactNode = content;
+        let node: React.ReactNode = renderContentWithMath(content, isEquation);
 
         if (link) {
           node = (

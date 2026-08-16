@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import Image from "next/image";
 import { Copy, ChevronRight } from "lucide-react";
+import katex from "katex";
 import TextRenderer from "@/components/TextRenderer";
 import type { NotionBlock, NotionRichText } from "@/lib/notion";
 
@@ -293,6 +294,27 @@ export default function BlockRenderer({
           <hr key={block.id} className="my-6 border-gray-700" />
         );
         break;
+
+      case "equation": {
+        const expression = block.equation?.expression ?? "";
+        let html = "";
+        try {
+          html = katex.renderToString(expression, {
+            throwOnError: false,
+            displayMode: true,
+          });
+        } catch {
+          html = expression;
+        }
+        nodes.push(
+          <div
+            key={block.id}
+            className="my-6 overflow-x-auto text-center py-2 text-white"
+            dangerouslySetInnerHTML={{ __html: html }}
+          />
+        );
+        break;
+      }
 
       case "table": {
         const tableData = (block as { table?: { has_column_header?: boolean } }).table;

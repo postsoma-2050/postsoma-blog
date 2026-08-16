@@ -4,8 +4,10 @@ import Link from "next/link";
 import { RiTimerLine, RiMusic2Line, RiAttachment2, RiArrowLeftLine } from "@remixicon/react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
 import rehypeSlug from "rehype-slug";
 import rehypeRaw from "rehype-raw";
+import rehypeKatex from "rehype-katex";
 import { getPostBySlug, getRelatedPosts } from "@/lib/posts";
 import {
   getPostBlocks,
@@ -316,8 +318,8 @@ export default async function PostPage({
         ) : markdown ? (
           <article className="prose prose-invert prose-lg max-w-none prose-headings:font-mono prose-a:text-cyan-400 hover:prose-a:text-cyan-300 prose-img:rounded-lg prose-img:mx-auto">
             <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              rehypePlugins={[rehypeRaw, rehypeSlug]}
+              remarkPlugins={[remarkGfm, remarkMath]}
+              rehypePlugins={[rehypeRaw, rehypeSlug, rehypeKatex]}
               components={{
                 a: ({ node, ...props }) => (
                   <a target="_blank" rel="noopener noreferrer" {...props} />

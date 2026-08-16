@@ -489,8 +489,9 @@ export async function getPostMarkdown(pageId: string): Promise<string> {
 // --- Notion Blocks API (for NotionRenderer) ---
 
 export type NotionRichText = {
-  type: "text";
-  text: { content: string; link?: { url: string } | null };
+  type?: string;
+  text?: { content: string; link?: { url: string } | null };
+  equation?: { expression: string };
   annotations?: {
     bold?: boolean;
     italic?: boolean;
@@ -534,6 +535,7 @@ export type NotionBlock = {
   image?: NotionBlockContent;
   toggle?: NotionBlockContent;
   code?: NotionCodeContent;
+  equation?: { expression: string };
 };
 
 function getBlockContent(block: NotionBlock): NotionBlockContent | undefined {
