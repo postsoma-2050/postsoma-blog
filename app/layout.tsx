@@ -29,14 +29,16 @@ export const metadata: Metadata = {
     "High-Tech meets High-Touch. AI, Blockchain, Philosophy, Investing, Notes.",
   icons: {
     icon: [
-      { url: "/favicon.ico?v=3", sizes: "any" },
-      { url: "/favicon-16x16.png?v=3", type: "image/png", sizes: "16x16" },
-      { url: "/favicon-32x32.png?v=3", type: "image/png", sizes: "32x32" },
-      { url: "/favicon.png?v=3", type: "image/png", sizes: "192x192" },
+      // PNG entries first — Safari picks these up reliably (ignores ICO with sizes="any")
+      { url: "/favicon-16x16.png?v=4", type: "image/png", sizes: "16x16" },
+      { url: "/favicon-32x32.png?v=4", type: "image/png", sizes: "32x32" },
+      { url: "/favicon.png?v=4",       type: "image/png", sizes: "192x192" },
+      // ICO as fallback for legacy browsers — placed last so Safari skips it
+      { url: "/favicon.ico?v=4", sizes: "48x48" },
     ],
-    shortcut: ["/favicon.ico?v=3"],
+    shortcut: ["/favicon-32x32.png?v=4"],
     apple: [
-      { url: "/apple-touch-icon.png?v=3", sizes: "180x180", type: "image/png" },
+      { url: "/apple-touch-icon.png?v=4", sizes: "180x180", type: "image/png" },
     ],
   },
   openGraph: {
