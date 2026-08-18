@@ -2,10 +2,8 @@ import type { MetadataRoute } from "next";
 import { getPublishedPosts } from "@/lib/notion";
 import { CATEGORY_SLUGS } from "@/lib/design-tokens";
 
-// Force runtime rendering: sitemap is generated on-request, not at build time.
-// This prevents Notion API calls from blocking `npm run build`.
-export const dynamic = "force-dynamic";
-export const revalidate = 3600; // Cache for 1 hour after first request
+// Cached on Vercel CDN and refreshed on-demand via Webhook
+export const revalidate = 86400; // 24 hours fallback
 
 const SITE_URL = "https://www.postsoma-2050.com";
 

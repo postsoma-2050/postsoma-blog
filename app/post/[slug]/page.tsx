@@ -72,7 +72,7 @@ export async function generateMetadata({
   };
 }
 
-export const revalidate = 3600; // Re-validate each post page at most once per hour
+export const revalidate = 604800; // 7 days fallback, rely primarily on On-Demand ISR Webhook
 export const dynamicParams = true; // Allow on-demand ISR for slugs not pre-built
 
 function getHeadingsFromMarkdown(markdown: string) {

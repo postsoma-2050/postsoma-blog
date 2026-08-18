@@ -57,7 +57,7 @@ export async function generateStaticParams() {
   return Object.values(CATEGORY_SLUGS).map((slug) => ({ category: slug }));
 }
 
-export const revalidate = 60;
+export const revalidate = 604800; // 7 days fallback, rely primarily on On-Demand ISR Webhook
 
 export default async function CategoryPage({
   params,

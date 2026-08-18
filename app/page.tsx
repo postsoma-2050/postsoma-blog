@@ -5,7 +5,7 @@ import LatestTransmissions from "@/components/LatestTransmissions";
 import SignalNoise from "@/components/SignalNoise";
 import { getPublishedPosts } from "@/lib/notion";
 
-export const revalidate = 60;
+export const revalidate = 604800; // 7 days fallback, rely primarily on On-Demand ISR Webhook
 
 const homeJsonLd = {
   "@context": "https://schema.org",
