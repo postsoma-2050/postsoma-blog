@@ -477,6 +477,48 @@ export async function getPublishedPosts(categorySlug?: string): Promise<Post[]> 
 }
 
 /**
+ * Directly queries Notion database by Slug property without relying on the full post list cache.
+ * Provides a foolproof fallback so newly published articles never return 404.
+ */
+export async function fetchPostBySlugDirectlyFromNotion(slug: string): Promise<Post | null> {
+  const databaseId = process.env.NOTION_DATABASE_ID;
+  if (!databaseId || !process.env.NOTION_API_KEY || !slug) return null;
+
+  try {
+    const notion = getNotionClient();
+    const db = await safeNotionCall(() => notion.databases.retrieve({ database_id: databaseId }));
+    const dataSourceId =
+      "data_sources" in db && Array.isArray(db.data_sources) && db.data_sources.length > 0
+        ? (db.data_sources[0] as { id?: string }).id
+        : databaseId;
+
+    if (!dataSourceId) return null;
+
+    const response = await safeNotionCall(() =>
+      notion.dataSources.query({
+        data_source_id: dataSourceId,
+        result_type: "page",
+        page_size: 1,
+        filter: {
+          and: [
+            { property: "Status", status: { equals: "Done" } },
+            { property: "Slug", rich_text: { equals: slug } },
+          ],
+        },
+      })
+    );
+
+    const results = Array.isArray(response.results) ? response.results : [];
+    if (results.length > 0) {
+      return mapPageToPost(results[0] as PageObjectResponse);
+    }
+  } catch (err) {
+    console.warn(`⚠️ Failed to fetch post directly by slug "${slug}":`, err);
+  }
+  return null;
+}
+
+/**
  * Fetches a Notion page's body blocks and returns markdown.
  * Use for rendering full post content. Returns empty string on failure.
  */

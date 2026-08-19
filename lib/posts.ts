@@ -1,4 +1,4 @@
-import { getPublishedPosts } from "./notion";
+import { getPublishedPosts, clearNotionCache, fetchPostBySlugDirectlyFromNotion } from "./notion";
 import {
   CATEGORY_SLUGS,
   getCategoryBySlug,
@@ -64,7 +64,19 @@ export async function getPostsByCategory(categorySlug: string): Promise<Post[]> 
 
 export async function getPostBySlug(slug: string): Promise<Post | null> {
   const posts = await getPosts();
-  return posts.find((p) => p.slug === slug) ?? null;
+  let post: Post | null | undefined = posts.find((p) => p.slug === slug);
+
+  // If not found in cache (e.g. newly published article on a warm serverless worker),
+  // directly query Notion database by Slug property without returning 404!
+  if (!post) {
+    post = await fetchPostBySlugDirectlyFromNotion(slug);
+    if (post) {
+      clearPostsMemoryCache();
+      clearNotionCache();
+    }
+  }
+
+  return post ?? null;
 }
 
 export function getCategorySlug(category: Category): string {
