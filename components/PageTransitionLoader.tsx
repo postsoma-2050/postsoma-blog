@@ -8,20 +8,21 @@ export default function PageTransitionLoader() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
-  const [targetTitle, setTargetTitle] = useState("");
+  const fromUrlRef = useRef<string>("");
   const safetyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // When pathname or searchParams change, the new page has arrived -> dismiss loading screen immediately
+  // ONLY close the loading screen when the route has ACTUALLY navigated to the new URL!
   useEffect(() => {
-    if (loading) {
+    const currentUrl =
+      pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : "");
+
+    // If we were waiting for navigation and the URL has changed from the starting page
+    if (fromUrlRef.current && currentUrl !== fromUrlRef.current) {
       if (safetyTimeoutRef.current) clearTimeout(safetyTimeoutRef.current);
-      const timeout = setTimeout(() => {
-        setLoading(false);
-        setTargetTitle("");
-      }, 100);
-      return () => clearTimeout(timeout);
+      setLoading(false);
+      fromUrlRef.current = "";
     }
-  }, [pathname, searchParams, loading]);
+  }, [pathname, searchParams]);
 
   // Intercept internal link clicks to trigger INSTANT full-screen transition (0ms)
   useEffect(() => {
@@ -49,27 +50,29 @@ export default function PageTransitionLoader() {
         return;
       }
 
-      // If clicking the exact current URL, ignore
-      const currentUrl = window.location.pathname + window.location.search;
+      const currentUrl =
+        window.location.pathname + window.location.search;
       if (href === currentUrl) return;
 
-      // Extract text or title from the clicked link if available
-      const linkText = target.innerText?.trim() || "";
-      setTargetTitle(linkText.length > 50 ? linkText.slice(0, 50) + "..." : linkText);
+      // Save origin URL
+      fromUrlRef.current = currentUrl;
 
       // Immediately enter full-screen loading screen (0ms)
       setLoading(true);
 
-      // Safety timeout in case navigation is aborted
+      // Safety timeout (25s) in case navigation completely fails/aborts
       if (safetyTimeoutRef.current) clearTimeout(safetyTimeoutRef.current);
       safetyTimeoutRef.current = setTimeout(() => {
         setLoading(false);
-      }, 20000);
+        fromUrlRef.current = "";
+      }, 25000);
     };
 
     const handlePopState = () => {
+      const currentUrl =
+        window.location.pathname + window.location.search;
+      fromUrlRef.current = currentUrl;
       setLoading(true);
-      setTargetTitle("正在返回上一页...");
     };
 
     document.addEventListener("click", handleAnchorClick);
@@ -90,66 +93,41 @@ export default function PageTransitionLoader() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#070707]/96 backdrop-blur-md text-text-primary select-none px-4"
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-bg/95 backdrop-blur-md select-none px-4"
           >
-            {/* Top Laser Shimmer Line */}
-            <div className="absolute top-0 left-0 right-0 h-[3px] bg-transparent overflow-hidden">
-              <div className="h-full w-full bg-gradient-to-r from-transparent via-[#00F0FF] to-transparent animate-laser-stream" />
+            {/* Minimalist Cyberpunk Spinner */}
+            <div className="relative flex h-16 w-16 items-center justify-center">
+              {/* Outer Cyan Rotating Ring */}
+              <div
+                className="absolute inset-0 rounded-full border-2 border-transparent border-t-cyan-400 border-r-cyan-400/30 animate-spin"
+                style={{
+                  boxShadow: "0 0 20px rgba(0, 240, 255, 0.35)",
+                  animationDuration: "1s",
+                }}
+              />
+
+              {/* Inner Reverse Rotating Ring */}
+              <div
+                className="absolute inset-2 rounded-full border-2 border-transparent border-b-cyan-300 border-l-cyan-300/40 animate-spin"
+                style={{
+                  animationDuration: "1.6s",
+                  animationDirection: "reverse",
+                }}
+              />
+
+              {/* Pulsing Center Node */}
+              <div className="h-2.5 w-2.5 rounded-full bg-cyan-400 shadow-[0_0_12px_#00F0FF] animate-pulse" />
             </div>
 
-            {/* Central Futuristic Loading HUD Console */}
-            <div className="relative w-full max-w-lg rounded-xl border border-cyan-500/40 bg-black/90 p-6 sm:p-8 font-mono shadow-[0_0_50px_rgba(0,240,255,0.25)]">
-              {/* Corner Accents */}
-              <div className="absolute -top-1 -left-1 h-3 w-3 border-t-2 border-l-2 border-cyan-400" />
-              <div className="absolute -top-1 -right-1 h-3 w-3 border-t-2 border-r-2 border-cyan-400" />
-              <div className="absolute -bottom-1 -left-1 h-3 w-3 border-b-2 border-l-2 border-cyan-400" />
-              <div className="absolute -bottom-1 -right-1 h-3 w-3 border-b-2 border-r-2 border-cyan-400" />
-
-              {/* Status Header */}
-              <div className="flex items-center justify-between border-b border-cyan-500/20 pb-4 mb-6">
-                <span className="flex items-center gap-2.5 text-cyan-400 font-bold tracking-widest text-xs uppercase">
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500 shadow-[0_0_10px_#00F0FF]" />
-                  </span>
-                  SYS.STREAM // 正在进入文章
-                </span>
-                <span className="text-[10px] text-cyan-400/60 uppercase tracking-widest">
-                  DECRYPTING...
-                </span>
-              </div>
-
-              {/* Target Post Preview (if available) */}
-              {targetTitle && (
-                <div className="mb-5 rounded border border-white/10 bg-white/[0.03] p-3 text-xs text-text-primary">
-                  <span className="text-cyan-400 font-bold mr-2">&gt; 目标:</span>
-                  <span className="text-gray-200">{targetTitle}</span>
-                </div>
-              )}
-
-              {/* Animated Progress Bar */}
-              <div className="space-y-2 mb-6">
-                <div className="flex justify-between text-[11px] text-cyan-300/80">
-                  <span>正在从 Notion 数据核心获取正文排版...</span>
-                </div>
-                <div className="h-2 w-full rounded bg-white/10 overflow-hidden relative">
-                  <div className="h-full w-full bg-gradient-to-r from-cyan-600 via-[#00F0FF] to-white animate-laser-stream" />
-                </div>
-              </div>
-
-              {/* Terminal Logs */}
-              <div className="space-y-1.5 text-[11px] text-gray-400 bg-black/60 rounded p-3 border border-white/5">
-                <p className="flex items-center gap-2 text-cyan-300">
-                  <span className="text-cyan-400">✔</span> 神经数据链路已建立 (Neural Link Connected)
-                </p>
-                <p className="flex items-center gap-2 text-cyan-300">
-                  <span className="text-cyan-400">✔</span> 正在解析 Markdown 与 Notion Blocks...
-                </p>
-                <p className="flex items-center gap-2 text-amber-400/90 animate-pulse">
-                  <span className="text-amber-400">⏳</span> 首次唤醒未缓存节点需数秒，完成后将永久秒开
-                </p>
-              </div>
+            {/* Clean Minimalist Typography */}
+            <div className="mt-8 text-center space-y-1.5 font-mono">
+              <p className="text-xs uppercase font-bold tracking-[0.25em] text-cyan-400">
+                POSTSOMA 2050 // LOADING NODE
+              </p>
+              <p className="text-[11px] tracking-wider text-text-secondary/60">
+                正在加载文章内容，请稍候...
+              </p>
             </div>
           </motion.div>
         )}
