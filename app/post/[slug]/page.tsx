@@ -105,14 +105,14 @@ function preprocessUnderlineTags(md: string): string {
   );
 }
 
-// Pre-render the top 20 latest articles at build time so they load instantaneously (0.05s) for visitors.
-// Remaining older articles are rendered on-demand (ISR) when visited.
+// Pre-render top 100 latest articles at build time to ensure instant 0.05s load time
+// while keeping build resource consumption low. Remaining older articles are rendered on-demand.
 export async function generateStaticParams() {
   try {
     const posts = await getPublishedPosts();
-    return posts.slice(0, 20).map((post) => ({ slug: post.slug }));
+    return posts.slice(0, 100).map((post) => ({ slug: post.slug }));
   } catch (err) {
-    console.warn("⚠️ Failed to pre-render top static posts at build time:", err);
+    console.warn("⚠️ Failed to pre-render static posts at build time:", err);
     return [];
   }
 }

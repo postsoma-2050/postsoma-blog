@@ -139,6 +139,19 @@ body[data-reading="true"]::before {
   }
 }
 
+@keyframes laser-stream {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-laser-stream {
+  animation: laser-stream 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
 /* Hero: hollow / stroke title (ghost watermark) */
 .hero-title-stroke {
   color: transparent;
