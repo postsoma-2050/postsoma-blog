@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import { JetBrains_Mono, Inter } from "next/font/google";
 import Link from "next/link";
 import Script from "next/script";
+import { Suspense } from "react";
 import "./globals.css";
 import "katex/dist/katex.min.css";
 import Navbar from "@/components/Navbar";
 import HudBar from "@/components/HudBar";
 import BodyRouteClass from "@/components/BodyRouteClass";
+import TopProgressBar from "@/components/TopProgressBar";
 import { getPublishedPosts, getArticleCountByCategory } from "@/lib/notion";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -131,6 +133,9 @@ export default async function RootLayout({
       <body
         className={`${jetbrainsMono.variable} ${inter.variable} min-h-screen bg-bg font-sans text-text-primary antialiased`}
       >
+        <Suspense fallback={null}>
+          <TopProgressBar />
+        </Suspense>
         <BodyRouteClass />
         <Navbar />
         <HudBar postCount={postCount} categoryCounts={categoryCounts} />
