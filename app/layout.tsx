@@ -8,7 +8,7 @@ import "katex/dist/katex.min.css";
 import Navbar from "@/components/Navbar";
 import HudBar from "@/components/HudBar";
 import BodyRouteClass from "@/components/BodyRouteClass";
-import TopProgressBar from "@/components/TopProgressBar";
+import PageTransitionLoader from "@/components/PageTransitionLoader";
 import { getPublishedPosts, getArticleCountByCategory } from "@/lib/notion";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -134,7 +134,7 @@ export default async function RootLayout({
         className={`${jetbrainsMono.variable} ${inter.variable} min-h-screen bg-bg font-sans text-text-primary antialiased`}
       >
         <Suspense fallback={null}>
-          <TopProgressBar />
+          <PageTransitionLoader />
         </Suspense>
         <BodyRouteClass />
         <Navbar />
