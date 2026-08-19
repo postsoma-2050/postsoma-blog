@@ -36,8 +36,17 @@ export async function generateMetadata({
   const title = post.name;
   const description = post.summary ?? `Read "${post.name}" on PostSoma 2050.`;
   const canonicalUrl = `${SITE_URL}/post/${post.slug}`;
-  const ogImage =
-    post.media.find((m) => m.kind === "image")?.url ?? `${SITE_URL}/no-future.jpg`;
+  const firstImage = post.media.find((m) => m.kind === "image");
+  const isFirstImageNotion =
+    firstImage &&
+    (firstImage.url.includes("amazonaws.com") ||
+      firstImage.url.includes("notion.so") ||
+      firstImage.url.includes("X-Amz-Expires"));
+  const ogImage = firstImage
+    ? isFirstImageNotion && post.id
+      ? `${SITE_URL}/api/image?pageId=${post.id}&mediaIndex=0`
+      : firstImage.url
+    : `${SITE_URL}/no-future.jpg`;
 
   return {
     title,
@@ -129,6 +138,18 @@ export default async function PostPage({
   const accent = CATEGORY_ACCENTS[post.category];
   const categorySlug = CATEGORY_SLUGS[post.category];
 
+  const firstImage = post.media.find((m) => m.kind === "image");
+  const isFirstImageNotion =
+    firstImage &&
+    (firstImage.url.includes("amazonaws.com") ||
+      firstImage.url.includes("notion.so") ||
+      firstImage.url.includes("X-Amz-Expires"));
+  const articleImage = firstImage
+    ? isFirstImageNotion && post.id
+      ? `${SITE_URL}/api/image?pageId=${post.id}&mediaIndex=0`
+      : firstImage.url
+    : `${SITE_URL}/no-future.jpg`;
+
   const articleJsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -158,7 +179,7 @@ export default async function PostPage({
           "@type": "WebPage",
           "@id": `${SITE_URL}/post/${post.slug}`
         },
-        "image": post.media.find((m) => m.kind === "image")?.url ?? `${SITE_URL}/no-future.jpg`
+        "image": articleImage
       },
       {
         "@type": "BreadcrumbList",
@@ -230,6 +251,15 @@ export default async function PostPage({
           <section className="mb-10 mt-2 space-y-5">
             {post.media.map((item, idx) => {
               if (item.kind === "image") {
+                const isNotionInternal =
+                  item.url.includes("amazonaws.com") ||
+                  item.url.includes("notion.so") ||
+                  item.url.includes("X-Amz-Expires");
+                const imageUrl =
+                  isNotionInternal && post.id
+                    ? `/api/image?pageId=${post.id}&mediaIndex=${idx}`
+                    : item.url;
+
                 return (
                   <div
                     key={idx}
@@ -241,7 +271,7 @@ export default async function PostPage({
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={item.url}
+                      src={imageUrl}
                       alt={item.name ?? "Post media"}
                       className="w-full h-auto rounded-lg"
                       loading="lazy"

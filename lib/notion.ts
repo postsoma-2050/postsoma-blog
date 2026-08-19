@@ -628,6 +628,69 @@ export async function getPostBlocks(pageId: string): Promise<NotionBlock[]> {
   });
 }
 
+/**
+ * Retrieves a fresh, unexpired image URL for a Notion block or page property.
+ */
+export async function getFreshImageUrl({
+  blockId,
+  pageId,
+  mediaIndex = 0,
+}: {
+  blockId?: string;
+  pageId?: string;
+  mediaIndex?: number;
+}): Promise<string | null> {
+  const apiKey = process.env.NOTION_API_KEY;
+  if (!apiKey) return null;
+
+  try {
+    const notion = getNotionClient();
+
+    if (blockId) {
+      const block = await safeNotionCall(() =>
+        notion.blocks.retrieve({ block_id: blockId })
+      ) as any;
+
+      if (block && typeof block === "object" && block.type === "image") {
+        const img = block.image;
+        const url =
+          img?.type === "file"
+            ? img.file?.url
+            : img?.type === "external"
+              ? img.external?.url
+              : null;
+        return url ?? null;
+      }
+    }
+
+    if (pageId) {
+      const page = await safeNotionCall(() =>
+        notion.pages.retrieve({ page_id: pageId })
+      ) as any;
+
+      const p = page?.properties ?? {};
+      const mediaProp = p["Media"];
+      if (mediaProp && mediaProp.type === "files" && Array.isArray(mediaProp.files)) {
+        const fileObj = mediaProp.files[mediaIndex];
+        if (fileObj) {
+          const url =
+            fileObj.type === "file"
+              ? fileObj.file?.url
+              : fileObj.type === "external"
+                ? fileObj.external?.url
+                : null;
+          return url ?? null;
+        }
+      }
+    }
+
+    return null;
+  } catch (err) {
+    console.warn("⚠️ Failed to retrieve fresh image URL from Notion:", { blockId, pageId, mediaIndex }, err);
+    return null;
+  }
+}
+
 function flattenBlocks(blocks: NotionBlock[]): NotionBlock[] {
   const out: NotionBlock[] = [];
   for (const b of blocks) {

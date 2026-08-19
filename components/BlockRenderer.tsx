@@ -369,28 +369,46 @@ export default function BlockRenderer({
 
       case "image": {
         const img = block.image;
-        const url =
+        const rawUrl =
           img?.type === "file"
             ? img.file?.url
             : img?.type === "external"
               ? img.external?.url
               : null;
+
+        const isNotionInternal =
+          img?.type === "file" ||
+          Boolean(
+            rawUrl &&
+              (rawUrl.includes("amazonaws.com") ||
+                rawUrl.includes("notion.so") ||
+                rawUrl.includes("X-Amz-Expires"))
+          );
+
+        // Route internal Notion files through persistent CDN caching proxy
+        const url = isNotionInternal
+          ? `/api/image?blockId=${block.id}`
+          : rawUrl;
+
         const alt =
           (img?.caption ?? [])
             .map((c) => (c as NotionRichText).text?.content ?? "")
             .join("")
             .trim() || "Post image";
+
         if (url) {
           nodes.push(
             <div key={block.id} className="my-8 flex justify-center">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={url}
                 alt={alt}
-                width={800}
-                height={450}
+                loading="lazy"
                 className="mx-auto rounded-lg shadow-lg max-w-full h-auto"
-                unoptimized
-                sizes="(max-width: 768px) 100vw, 800px"
+                style={{
+                  border: "1px solid var(--border-subtle)",
+                  boxShadow: "0 0 20px 2px rgba(0, 240, 255, 0.1)",
+                }}
               />
             </div>
           );
