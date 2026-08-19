@@ -1,19 +1,21 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { CATEGORY_SLUGS } from "@/lib/design-tokens";
+import { clearNotionCache } from "@/lib/notion";
+import { clearPostsMemoryCache, getPostBySlug } from "@/lib/posts";
 
 /**
  * On-Demand ISR Revalidation API Endpoint
  * 
  * Supports:
  * 1. POST /api/revalidate (Webhook / automation)
- * 2. GET /api/revalidate?secret=...&path=... (Manual verification in browser)
+ * 2. GET /api/revalidate?secret=...&slug=... (Manual verification in browser)
  * 
- * Headers or Query / Body supported for authentication:
- * - Authorization: Bearer <REVALIDATION_SECRET>
- * - x-revalidation-secret: <REVALIDATION_SECRET>
+ * Authentication supported via:
  * - Query param: ?secret=<REVALIDATION_SECRET>
- * - Body field: { "secret": "<REVALIDATION_SECRET>" }
+ * - Header: Authorization: Bearer <REVALIDATION_SECRET>
+ * - Header: x-revalidation-secret: <REVALIDATION_SECRET>
+ * - Body: { "secret": "<REVALIDATION_SECRET>" }
  */
 
 function authenticate(req: NextRequest, bodySecret?: string): boolean {
@@ -23,23 +25,23 @@ function authenticate(req: NextRequest, bodySecret?: string): boolean {
     return false;
   }
 
-  // 1. Check Bearer token in Authorization header
+  // 1. Check query param
+  const url = new URL(req.url);
+  const querySecret = url.searchParams.get("secret");
+  if (querySecret && querySecret.trim() === secretEnv) {
+    return true;
+  }
+
+  // 2. Check Bearer token in Authorization header
   const authHeader = req.headers.get("authorization");
   if (authHeader?.startsWith("Bearer ")) {
     const token = authHeader.substring(7).trim();
     if (token === secretEnv) return true;
   }
 
-  // 2. Check custom header
+  // 3. Check custom header
   const customHeader = req.headers.get("x-revalidation-secret");
   if (customHeader && customHeader.trim() === secretEnv) {
-    return true;
-  }
-
-  // 3. Check query param
-  const url = new URL(req.url);
-  const querySecret = url.searchParams.get("secret");
-  if (querySecret && querySecret.trim() === secretEnv) {
     return true;
   }
 
@@ -59,7 +61,7 @@ export async function POST(req: NextRequest) {
       body = JSON.parse(text);
     }
   } catch (err) {
-    // Body is optional or might not be JSON
+    // Body is optional
   }
 
   if (!authenticate(req, body?.secret)) {
@@ -72,31 +74,40 @@ export async function POST(req: NextRequest) {
   const revalidated: string[] = [];
 
   try {
-    // 1. Revalidate all / layout
+    // 1. Always purge internal memory & Notion disk cache so fresh data is fetched
+    clearPostsMemoryCache();
+
+    // 2. Revalidate all / layout / full site
     if (body.all === true || body.type === "layout") {
+      clearNotionCache(); // Wipe all Notion block/list caches
       revalidatePath("/", "layout");
-      revalidated.push("layout (entire site)");
+      revalidated.push("layout (entire site & all notion caches purged)");
     }
 
-    // 2. Revalidate by specific slug
+    // 3. Revalidate by specific slug
     if (body.slug && typeof body.slug === "string") {
-      const slug = body.slug.trim().replace(/^\/post\//, "");
-      const postPath = `/post/${slug}`;
+      const cleanSlug = body.slug.trim().replace(/^\/post\//, "");
+      const post = await getPostBySlug(cleanSlug);
+      
+      // Purge disk cache for this post's blocks & list caches
+      clearNotionCache(post?.id);
+
+      const postPath = `/post/${cleanSlug}`;
       revalidatePath(postPath, "page");
+      revalidatePath("/post/[slug]", "page");
       revalidated.push(postPath);
 
-      // Revalidate homepage as latest posts might change
+      // Revalidate homepage
       revalidatePath("/", "page");
       revalidated.push("/");
 
-      // Revalidate category page if provided, or revalidate all category pages
+      // Revalidate category pages
       if (body.category && typeof body.category === "string") {
         const catSlug = body.category.trim().replace(/^\//, "");
         const catPath = `/${catSlug}`;
         revalidatePath(catPath, "page");
         revalidated.push(catPath);
       } else {
-        // Automatically revalidate known category paths
         for (const slug of Object.values(CATEGORY_SLUGS)) {
           revalidatePath(`/${slug}`, "page");
         }
@@ -108,7 +119,7 @@ export async function POST(req: NextRequest) {
       revalidated.push("/sitemap.xml");
     }
 
-    // 3. Revalidate by explicit path
+    // 4. Revalidate by explicit path
     if (body.path && typeof body.path === "string") {
       const targetPath = body.path.trim();
       const type = body.pathType === "layout" ? "layout" : "page";
@@ -116,14 +127,15 @@ export async function POST(req: NextRequest) {
       revalidated.push(`${targetPath} (${type})`);
     }
 
-    // 4. Revalidate by cache tag
+    // 5. Revalidate by cache tag
     if (body.tag && typeof body.tag === "string") {
       revalidateTag(body.tag.trim());
       revalidated.push(`tag: ${body.tag}`);
     }
 
-    // If no specific options were given, revalidate homepage and sitemap by default
+    // Fallback if no specific target
     if (revalidated.length === 0) {
+      clearNotionCache();
       revalidatePath("/", "page");
       revalidatePath("/sitemap.xml");
       revalidated.push("/", "/sitemap.xml");
@@ -131,7 +143,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "On-demand revalidation completed successfully.",
+      message: "On-demand revalidation and multi-layer cache purge completed successfully.",
       revalidated,
       timestamp: new Date().toISOString(),
     });
@@ -165,18 +177,33 @@ export async function GET(req: NextRequest) {
   const revalidated: string[] = [];
 
   try {
+    // 1. Always purge internal memory cache
+    clearPostsMemoryCache();
+
     if (all) {
+      clearNotionCache(); // Wipe all Notion block/list caches
       revalidatePath("/", "layout");
-      revalidated.push("layout (entire site)");
+      revalidated.push("layout (entire site & all notion caches purged)");
     }
 
     if (slug) {
       const cleanSlug = slug.trim().replace(/^\/post\//, "");
+      const post = await getPostBySlug(cleanSlug);
+      
+      // Purge disk cache for this post's blocks & list caches
+      clearNotionCache(post?.id);
+
       const postPath = `/post/${cleanSlug}`;
       revalidatePath(postPath, "page");
+      revalidatePath("/post/[slug]", "page");
       revalidatePath("/", "page");
+      
+      for (const catSlug of Object.values(CATEGORY_SLUGS)) {
+        revalidatePath(`/${catSlug}`, "page");
+      }
+
       revalidatePath("/sitemap.xml");
-      revalidated.push(postPath, "/", "/sitemap.xml");
+      revalidated.push(postPath, "/", "all category pages", "/sitemap.xml");
     }
 
     if (path) {
@@ -191,6 +218,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (revalidated.length === 0) {
+      clearNotionCache();
       revalidatePath("/", "page");
       revalidatePath("/sitemap.xml");
       revalidated.push("/", "/sitemap.xml");
@@ -198,7 +226,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "On-demand revalidation completed successfully.",
+      message: "On-demand revalidation and multi-layer cache purge completed successfully.",
       revalidated,
       timestamp: new Date().toISOString(),
     });

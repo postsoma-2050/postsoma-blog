@@ -111,6 +111,29 @@ async function withFileCache<T>(
   return freshData;
 }
 
+/**
+ * Purges the local disk cache for Notion data (used during On-Demand Revalidation).
+ * If pageId is provided, clears all cache files containing that pageId as well as list caches.
+ * If no pageId is provided, clears all Notion cache files completely.
+ */
+export function clearNotionCache(pageId?: string) {
+  try {
+    if (fs.existsSync(CACHE_DIR)) {
+      const files = fs.readdirSync(CACHE_DIR);
+      for (const file of files) {
+        if (!pageId || file.includes(pageId) || file.startsWith("published_posts")) {
+          try {
+            fs.unlinkSync(path.join(CACHE_DIR, file));
+          } catch {
+            // ignore individual unlink error
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("⚠️ [Notion Cache] Failed to clear disk cache files:", err);
+  }
+}
 
 /**
  * Maps our internal category slugs to exact Notion database category strings.

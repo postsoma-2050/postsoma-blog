@@ -31,6 +31,11 @@ let cachedPosts: Post[] | null = null;
 let lastFetchTime = 0;
 const CACHE_TTL = 60 * 1000; // 60 seconds Cache Time-to-Live
 
+export function clearPostsMemoryCache() {
+  cachedPosts = null;
+  lastFetchTime = 0;
+}
+
 export async function getPosts(): Promise<Post[]> {
   const now = Date.now();
   if (cachedPosts && (now - lastFetchTime < CACHE_TTL)) {
