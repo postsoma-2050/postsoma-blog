@@ -24,7 +24,7 @@ export default function PageTransitionLoader() {
     }
   }, [pathname, searchParams]);
 
-  // Intercept internal link clicks to trigger INSTANT full-screen transition (0ms)
+  // Intercept article link clicks to trigger full-screen transition ONLY when entering posts
   useEffect(() => {
     const handleAnchorClick = (e: MouseEvent) => {
       const target = (e.target as HTMLElement).closest("a");
@@ -50,6 +50,13 @@ export default function PageTransitionLoader() {
         return;
       }
 
+      // ONLY trigger full-screen loading for entering post pages (/post/...)
+      // Standard category tabs, home, about, and filters load instantly and do NOT need full-screen loading
+      const isPostLink = href.startsWith("/post/") || href.includes("/post/");
+      if (!isPostLink) {
+        return;
+      }
+
       const currentUrl =
         window.location.pathname + window.location.search;
       if (href === currentUrl) return;
@@ -57,7 +64,7 @@ export default function PageTransitionLoader() {
       // Save origin URL
       fromUrlRef.current = currentUrl;
 
-      // Immediately enter full-screen loading screen (0ms)
+      // Enter full-screen loading screen (0ms)
       setLoading(true);
 
       // Safety timeout (25s) in case navigation completely fails/aborts
@@ -68,19 +75,12 @@ export default function PageTransitionLoader() {
       }, 25000);
     };
 
-    const handlePopState = () => {
-      const currentUrl =
-        window.location.pathname + window.location.search;
-      fromUrlRef.current = currentUrl;
-      setLoading(true);
-    };
-
+    // Note: We intentionally do NOT listen to 'popstate' (browser back/forward button)
+    // so going back to previous pages is 100% instant from browser cache without any loading screen.
     document.addEventListener("click", handleAnchorClick);
-    window.addEventListener("popstate", handlePopState);
 
     return () => {
       document.removeEventListener("click", handleAnchorClick);
-      window.removeEventListener("popstate", handlePopState);
       if (safetyTimeoutRef.current) clearTimeout(safetyTimeoutRef.current);
     };
   }, []);
@@ -93,7 +93,7 @@ export default function PageTransitionLoader() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.15 }}
             className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-bg/95 backdrop-blur-md select-none px-4"
           >
             {/* Minimalist Cyberpunk Spinner */}
