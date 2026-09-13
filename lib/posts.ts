@@ -4,28 +4,11 @@ import {
   getCategoryBySlug,
   type Category,
 } from "./design-tokens";
+import type { Post } from "./types";
 
-export type MediaItem = {
-  url: string;
-  name?: string;
-  mime?: string;
-  kind: "image" | "video" | "audio" | "other";
-};
-
-export type Post = {
-  id?: string;
-  name: string;
-  slug: string;
-  category: Category;
-  subCategory?: string | null;
-  summary: string | null;
-  aiSummary?: string | null;
-  tags: string[];
-  cover: string | null;
-  publishedDate: string | null;
-  featured: boolean;
-  media: MediaItem[];
-};
+// Re-export shared types from lib/types.ts for full backwards compatibility.
+// All existing callers of `import { Post, MediaItem } from "@/lib/posts"` continue to work.
+export type { Post, MediaItem } from "./types";
 
 let cachedPosts: Post[] | null = null;
 let lastFetchTime = 0;
