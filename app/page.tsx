@@ -1,8 +1,7 @@
-import Link from "next/link";
-import HeroCell from "@/components/bento/HeroCell";
+import HeroSearch from "@/components/HeroSearch";
+import HorizontalRail from "@/components/HorizontalRail";
+import CuratedPostList from "@/components/CuratedPostList";
 import PortalCell from "@/components/bento/PortalCell";
-import LatestTransmissions from "@/components/LatestTransmissions";
-import SignalNoise from "@/components/SignalNoise";
 import { getPublishedPosts } from "@/lib/notion";
 
 export const revalidate = 604800; // 7 days fallback, rely primarily on On-Demand ISR Webhook
@@ -29,6 +28,29 @@ const homeJsonLd = {
   }
 };
 
+/**
+ * Deterministically samples `count` elements from `pool` using the current UTC date as seed.
+ * Guarantees zero SSR hydration mismatch while ensuring fresh daily serendipitous discovery.
+ */
+function getDailySample<T>(pool: T[], count: number = 6): T[] {
+  if (pool.length <= count) return pool;
+  const now = new Date();
+  const dateStr = `${now.getUTCFullYear()}-${now.getUTCMonth() + 1}-${now.getUTCDate()}`;
+  let seed = 0;
+  for (let i = 0; i < dateStr.length; i++) {
+    seed = (seed << 5) - seed + dateStr.charCodeAt(i);
+    seed |= 0;
+  }
+  let s = Math.abs(seed) || 1234567;
+  const copy = [...pool];
+  for (let i = copy.length - 1; i > 0; i--) {
+    s = (s * 16807) % 2147483647;
+    const j = Math.floor(((s - 1) / 2147483646) * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy.slice(0, count);
+}
+
 export default async function HomePage() {
   const posts = await getPublishedPosts();
   
@@ -39,50 +61,37 @@ export default async function HomePage() {
     return timeB - timeA;
   });
 
-  const latestPosts = sortedPosts.slice(0, 3);
-  const latestSlugs = new Set(latestPosts.map((p) => p.slug));
+  // 1. Top Horizontal Rail: Exclusively the 8 latest transmissions
+  const latestPosts = sortedPosts.slice(0, 8);
+
+  // 2. Bottom Random Flow: Candidate archive pool strictly excluding the 8 latest
+  const archivePool = sortedPosts.length > 8 ? sortedPosts.slice(8) : sortedPosts;
+
+  // Deterministically sample 6 random nodes for initial SSR load based on date seed
+  const initialRandomPosts = getDailySample(archivePool, 6);
 
   return (
-    <div className="space-y-0">
+    <div className="space-y-16 sm:space-y-20">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(homeJsonLd) }}
       />
 
-      {/* ── Hero Banner ──────────────────────────────────────────────────── */}
-      <Link
-        href="/sheshin-notes"
-        className="group cursor-pointer block"
-      >
-        <div className="h-full flex flex-col justify-between rounded border border-cyan-400/70 animate-hero-heartbeat">
-          <HeroCell asChild />
-        </div>
-      </Link>
+      {/* ── 1. Hero 终端检索 ──────────────────────────────────────────────── */}
+      <HeroSearch postCount={posts.length} />
 
-      {/* ── LATEST_TRANSMISSIONS ─────────────────────────────────────────── */}
-      <div className="mt-6">
-        <LatestTransmissions latestPosts={latestPosts} />
-      </div>
+      {/* ── 2. 横向滑动精选轨道（严格 8 篇最新节点，100ms 物理抬升） ──────── */}
+      <HorizontalRail posts={latestPosts} title="Latest Transmissions" />
 
-      {/* ── SIGNAL_NOISE ─────────────────────────────────────────────────── */}
-      <div className="mt-6">
-        <SignalNoise allPosts={posts} latestSlugs={latestSlugs} />
-      </div>
+      {/* ── 3. 随机探索文章流（排除最新 8 篇，严格 6 篇，支持一键洗牌） ─────── */}
+      <CuratedPostList
+        posts={archivePool}
+        initialPosts={initialRandomPosts}
+        totalCount={posts.length}
+      />
 
-      {/* ── PORTALS ──────────────────────────────────────────────────────── */}
-      <section aria-label="Portals" className="mt-8">
-        <div className="mb-3 flex items-center gap-3">
-          <span className="font-mono text-xs font-bold tracking-widest text-text-secondary/40">
-            {"[ \u2197 ]"}
-          </span>
-          <h2 className="font-mono text-sm font-bold uppercase tracking-widest text-text-primary">
-            PORTALS
-          </h2>
-          <span className="font-mono text-xs text-text-secondary/50">
-            {"// SYS.REDIRECT"}
-          </span>
-          <div className="flex-1 h-px bg-gradient-to-r from-white/8 to-transparent hidden sm:block" />
-        </div>
+      {/* ── 4. 底部系统外链入口 ───────────────────────────────────────────── */}
+      <section aria-label="Portals">
         <PortalCell />
       </section>
     </div>

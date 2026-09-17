@@ -1,105 +1,50 @@
 "use client";
 
-import { CATEGORY_ACCENTS } from "@/lib/design-tokens";
-
-const STATUS_ITEMS = [
-    { tag: "OPS", value: "GREEN", valueClass: "text-cyan-300 font-bold" },
-    { tag: "HEAT", value: "LOW", valueClass: "text-cyan-300" },
-    { tag: "SIGNAL", value: "CLEAN", valueClass: "text-cyan-300" },
-];
+import React from "react";
 
 export default function PortalCell() {
-    return (
-        <a
-            href="https://postsoma-2050.website"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Open Armory (postsoma-2050.website)"
-            className="portal-card group relative flex min-h-[120px] flex-col justify-between overflow-hidden rounded border border-solid border-cyan-500/40 bg-gradient-to-br from-slate-950 via-neutral-900 to-zinc-950 p-5 shadow-[0_0_12px_rgba(6,182,212,0.12),inset_0_1px_0_rgba(6,182,212,0.06)] transition-all duration-150 ease-out hover:border-dashed hover:border-cyan-400 hover:shadow-[0_0_24px_rgba(6,182,212,0.4),inset_0_1px_0_rgba(6,182,212,0.12)] active:shadow-[0_0_36px_rgba(6,182,212,0.6)] active:border-cyan-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-900"
-        >
-            {/* Cyan cold sheen */}
-            <div
-                className="pointer-events-none absolute inset-0 rounded opacity-[0.25]"
-                style={{
-                    backgroundImage:
-                        "linear-gradient(105deg, rgba(6,182,212,0.05) 0%, transparent 42%, transparent 58%, rgba(14,165,233,0.03) 100%)",
-                }}
-                aria-hidden
-            />
-            {/* Tech dot-matrix grid pattern */}
-            <div
-                className="pointer-events-none absolute inset-0 rounded opacity-[0.35]"
-                style={{
-                    backgroundImage: "radial-gradient(rgba(6, 182, 212, 0.08) 1px, transparent 1px)",
-                    backgroundSize: "8px 8px",
-                }}
-                aria-hidden
-            />
-            {/* Fine horizontal grain — brushed metal */}
-            <div
-                className="pointer-events-none absolute inset-0 rounded opacity-15"
-                style={{
-                    backgroundImage:
-                        "repeating-linear-gradient(180deg, transparent, transparent 3px, rgba(148,163,184,0.04) 3px, rgba(148,163,184,0.04) 4px)",
-                }}
-                aria-hidden
-            />
-            {/* Terminal scanlines */}
-            <div
-                className="pointer-events-none absolute inset-0 rounded opacity-25"
-                style={{
-                    backgroundImage:
-                        "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(6,182,212,0.02) 2px, rgba(6,182,212,0.02) 4px)",
-                }}
-                aria-hidden
-            />
-
-            <div className="relative z-10 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs font-medium uppercase tracking-widest text-cyan-400/90">
-                        &gt;_ [SYS_PORTAL]
-                    </span>
-                    <span className="font-mono text-[9px] font-bold tracking-wider text-cyan-400/90 bg-cyan-950/45 px-1.5 py-0.5 rounded border border-cyan-500/25">
-                        {"// SYS.REDIRECT"}
-                    </span>
-                </div>
-                <span className="font-mono text-[10px] uppercase tracking-wide text-slate-500">
-                    EXTERNAL LINK
-                </span>
+  return (
+    <div className="pt-10 pb-6 border-t-[0.5px] border-[var(--border-subtle)]">
+      <a
+        href="https://postsoma-2050.website"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ "--hover-color": "var(--accent-philosophy)" } as React.CSSProperties}
+        className="group relative block -mx-4 px-5 py-4 rounded-[20px] transition-all duration-150 ease-out hover:bg-black/[0.035] dark:hover:bg-white/[0.04] hover:-translate-y-0.5"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          {/* 左侧：微型状态 + 项目名称与定位 */}
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 font-mono text-[10px] tracking-wider uppercase text-[var(--text-muted)]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-philosophy)] animate-pulse" />
+              <span className="font-semibold text-[var(--text-primary)]">POSTSOMA MATRIX</span>
+              <span className="opacity-40">/</span>
+              <span>MASTER SYSTEM</span>
             </div>
-
-            <div className="relative z-10 mt-3 flex flex-1 flex-col justify-center">
-                <h3 className="font-mono text-lg font-bold tracking-tight text-white sm:text-xl">
-                    PORTAL: ARMORY
-                </h3>
-                <p className="mt-0.5 font-mono text-[11px] leading-tight text-slate-400 sm:text-xs">
-                    Curated tools & resources  //  My deployed projects
-                </p>
+            <div className="flex items-center gap-2">
+              <h3 className="font-sans text-[1.1rem] font-semibold text-[var(--text-primary)] group-hover:text-[var(--hover-color)] transition-colors">
+                Armory Deployed Tools
+              </h3>
             </div>
+            <p className="font-sans text-[0.85rem] text-[var(--text-secondary)] leading-relaxed line-clamp-1">
+              The full production nexus of web instruments, AI agents, and deployed artifacts.
+            </p>
+          </div>
 
-            <div className="relative z-10 mt-3 flex flex-wrap items-center justify-between gap-2">
-                <div className="flex flex-wrap items-center gap-3 font-mono text-[10px] sm:gap-4 sm:text-xs">
-                    {STATUS_ITEMS.map(({ tag, value, valueClass }) => (
-                        <span key={tag} className="flex items-center gap-1">
-                            <span className="text-slate-500">{tag}:</span>
-                            <span className={valueClass}>{value}</span>
-                        </span>
-                    ))}
-                </div>
-
-                <span
-                    className="w-full md:w-auto h-11 md:h-auto flex md:inline-flex items-center justify-center text-center font-mono text-xs font-semibold tracking-wide text-cyan-200 border border-cyan-500/30 md:border-0 bg-cyan-950/30 md:bg-transparent rounded md:rounded-none mt-3 md:mt-0"
-                    style={{
-                        textShadow:
-                            "0 0 8px rgba(6,182,212,0.4), 0 0 16px rgba(6,182,212,0.2)",
-                    }}
-                >
-                    Enter Armory{" "}
-                    <span className="text-cyan-400 font-bold ml-1.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200 inline-block">
-                        ↗
-                    </span>
-                </span>
-            </div>
-        </a>
-    );
+          {/* 右侧：极简外跳微标 */}
+          <div className="flex items-center gap-1.5 shrink-0 font-mono text-[11px] text-[var(--text-muted)] group-hover:text-[var(--text-primary)] transition-colors pt-1 sm:pt-0">
+            <span>ENTER ARMORY</span>
+            <svg 
+              className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </div>
+        </div>
+      </a>
+    </div>
+  );
 }

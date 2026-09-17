@@ -72,7 +72,7 @@ export default function FurtherReadSection({
         style={{ color: accent }}
       >
         <RiCompass3Line className="w-5 h-5" />
-        Further Read // 延伸閱讀
+        Further Inquiries · 延伸閱讀
       </h3>
       <div className="mt-6 grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-3">
         {displayPosts.map((relatedPost, index) => (

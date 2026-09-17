@@ -105,33 +105,17 @@ export default async function CategoryPage({
   };
 
   const renderContent = () => {
-    if (categorySlug === "blockchain") {
-      return (
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-12">
-          <DocLayout title={title} category={category} posts={posts} />
-        </div>
-      );
-    }
-
-    if (categorySlug === "philosophy") {
-      return (
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 py-6 sm:py-12">
-          <ManifestoLayout title={title} category={category} posts={posts} />
-        </div>
-      );
-    }
-
-    if (categorySlug === "sheshin-notes") {
-      return (
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 py-6 sm:py-12">
-          <ListLayout title={title} category={category} posts={posts} />
-        </div>
-      );
-    }
-
     return (
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-12">
-        <GridLayout title={title} category={category} posts={posts} />
+      <div className="mx-auto max-w-[760px] px-4 sm:px-6 py-6 sm:py-12">
+        {categorySlug === "blockchain" || categorySlug === "investing" ? (
+          <DocLayout title={title} category={category} posts={posts} />
+        ) : categorySlug === "philosophy" ? (
+          <ManifestoLayout title={title} category={category} posts={posts} />
+        ) : categorySlug === "sheshin-notes" ? (
+          <ListLayout title={title} category={category} posts={posts} />
+        ) : (
+          <GridLayout title={title} category={category} posts={posts} />
+        )}
       </div>
     );
   };

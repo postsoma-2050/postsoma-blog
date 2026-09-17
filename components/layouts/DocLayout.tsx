@@ -3,47 +3,15 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import PostCard from "@/components/PostCard";
+import SubCategoryFilter, { ALL_LABEL } from "@/components/SubCategoryFilter";
 import type { Post } from "@/lib/posts";
-import { CATEGORY_ACCENTS, type Category } from "@/lib/design-tokens";
-
-const ALL_LABEL = "All";
+import { CATEGORY_ACCENTS, toEnglishSubCategory, type Category } from "@/lib/design-tokens";
 
 type DocLayoutProps = {
   title: string;
   category: Category;
   posts: Post[];
 };
-
-function SubNavButton({
-  label,
-  isActive,
-  accent,
-  onClick,
-  className = "",
-}: {
-  label: string;
-  isActive: boolean;
-  accent: string;
-  onClick: () => void;
-  className?: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`
-        font-mono text-sm transition-colors
-        ${className}
-        ${isActive
-          ? "text-text-primary"
-          : "text-text-secondary hover:text-text-primary"}
-      `}
-      style={isActive ? { color: accent } : undefined}
-    >
-      {label}
-    </button>
-  );
-}
 
 export default function DocLayout({
   title,
@@ -54,130 +22,76 @@ export default function DocLayout({
   const subCategories = useMemo(
     () =>
       Array.from(
-        new Set(posts.map((p) => p.subCategory).filter((x): x is string => !!x))
+        new Set(posts.map((p) => p.subCategory?.trim()).filter((x): x is string => !!x))
       ),
     [posts]
   );
 
-  const [selectedSub, setSelectedSub] = useState<string | null>(ALL_LABEL);
+  const [selectedSub, setSelectedSub] = useState<string>(ALL_LABEL);
 
   const filteredPosts =
     !selectedSub || selectedSub === ALL_LABEL
       ? posts
-      : posts.filter((p) => p.subCategory === selectedSub);
-
-  const navItems = [ALL_LABEL, ...subCategories];
+      : posts.filter((p) => {
+          if (!p.subCategory) return false;
+          if (p.subCategory === selectedSub) return true;
+          const en = toEnglishSubCategory(p.subCategory, category);
+          const selEn = toEnglishSubCategory(selectedSub, category) || selectedSub;
+          return en === selEn || en === selectedSub;
+        });
 
   return (
-    <div className="flex flex-col gap-8 lg:flex-row lg:gap-12">
-      {/* Mobile: horizontal scrollable capsules at top */}
-      <nav
-        className="flex shrink-0 gap-2 overflow-x-auto pb-2 lg:hidden"
-        aria-label="Sub-category filter"
+    <div className="mx-auto max-w-[760px] space-y-8">
+      {/* Header */}
+      <motion.header
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2 }}
+        className="border-b border-[var(--border-subtle)] pb-6"
       >
-        {navItems.map((sub) => {
-          const isActive =
-            sub === ALL_LABEL ? !selectedSub || selectedSub === ALL_LABEL : selectedSub === sub;
-          return (
-            <button
-              key={sub}
-              type="button"
-              onClick={() => setSelectedSub(sub === ALL_LABEL ? ALL_LABEL : sub)}
-              className={`
-                shrink-0 rounded-full border px-4 py-2 font-mono text-sm transition-all
-                ${isActive
-                  ? "border-current"
-                  : "border-gray-700 text-text-secondary hover:border-gray-600 hover:text-text-primary"}
-              `}
-              style={
-                isActive
-                  ? {
-                      borderColor: accent,
-                      color: accent,
-                      boxShadow: `0 0 12px -4px ${accent}4D`,
-                    }
-                  : undefined
-              }
+        <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-[var(--text-muted)] mb-2">
+          <span>PostSoma Archive</span>
+          <span>·</span>
+          <span>{posts.length} Transmissions</span>
+        </div>
+        <h1 className="font-sans text-3xl sm:text-4xl font-semibold tracking-tight text-[var(--text-primary)]">
+          {title}
+        </h1>
+        <p className="mt-2 text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
+          {category === "Investing"
+            ? "Mental models, macro frameworks, and margin-of-safety principles for asymmetric capital allocation."
+            : "Curated knowledge on decentralized infrastructure, cryptographic protocols, and autonomous state machines."}
+        </p>
+      </motion.header>
+
+      {/* Horizontal Category Pills Filter */}
+      {subCategories.length > 0 && (
+        <SubCategoryFilter
+          subCategories={subCategories}
+          selected={selectedSub}
+          onSelect={setSelectedSub}
+          accent={accent}
+        />
+      )}
+
+      {/* Articles Magazine Flow */}
+      <div className="divide-y divide-[var(--border-subtle)]">
+        {filteredPosts.length === 0 ? (
+          <p className="py-12 font-sans text-center text-[var(--text-secondary)]">
+            No posts found in this section.
+          </p>
+        ) : (
+          filteredPosts.map((post, i) => (
+            <motion.div
+              key={post.slug}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: Math.min(0.04 * i, 0.3) }}
             >
-              {sub}
-            </button>
-          );
-        })}
-      </nav>
-
-      {/* Desktop: sticky left sidebar */}
-      <motion.aside
-        initial={{ opacity: 0, x: -12 }}
-        animate={{ opacity: 1, x: 0 }}
-        className="hidden shrink-0 lg:block lg:w-56"
-      >
-        <nav
-          className="sticky top-24 space-y-2 border-l pl-4"
-          style={{ borderLeftColor: accent }}
-          aria-label="Sub-category navigation"
-        >
-          {navItems.length > 0 ? (
-            navItems.map((sub) => {
-              const isActive =
-                sub === ALL_LABEL
-                  ? !selectedSub || selectedSub === ALL_LABEL
-                  : selectedSub === sub;
-              return (
-                <SubNavButton
-                  key={sub}
-                  label={sub}
-                  isActive={isActive}
-                  accent={accent}
-                  onClick={() =>
-                    setSelectedSub(sub === ALL_LABEL ? ALL_LABEL : sub)
-                  }
-                  className="block w-full text-left"
-                />
-              );
-            })
-          ) : (
-            <span className="font-mono text-sm text-text-secondary">
-              All posts
-            </span>
-          )}
-        </nav>
-      </motion.aside>
-
-      {/* Main content: filtered list */}
-      <div className="min-w-0 flex-1">
-        <motion.header
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="border-b border-[var(--border-subtle)] pb-4"
-        >
-          <h1
-            className="font-mono text-3xl font-semibold tracking-tight sm:text-4xl"
-            style={{ color: accent }}
-          >
-            {title}
-          </h1>
-        </motion.header>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.1 }}
-          className="mt-6 space-y-6"
-        >
-          {filteredPosts.length === 0 ? (
-            <p className="font-sans text-text-secondary">No posts in this section.</p>
-          ) : (
-            filteredPosts.map((post, i) => (
-              <motion.section
-                key={post.slug}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.05 * i }}
-              >
-                <PostCard post={post} accent={accent} size="compact" />
-              </motion.section>
-            ))
-          )}
-        </motion.div>
+              <PostCard post={post} accent={accent} size="stream" />
+            </motion.div>
+          ))
+        )}
       </div>
     </div>
   );

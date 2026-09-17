@@ -1,7 +1,5 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import Link from "next/link";
-import { RiTimerLine, RiMusic2Line, RiAttachment2, RiArrowLeftLine } from "@remixicon/react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
@@ -22,8 +20,16 @@ import TableOfContents from "@/components/TableOfContents";
 import NotionRenderer from "@/components/NotionRenderer";
 import AICard from "@/components/AICard";
 import FurtherReadSection from "@/components/FurtherReadSection";
+import PostHeader from "@/components/post/PostHeader";
+import PostMediaGallery from "@/components/post/PostMediaGallery";
 
-const SITE_URL = "https://www.postsoma-2050.com";
+import {
+  SITE_URL,
+  getArticleOgImage,
+  buildArticleJsonLd,
+  getHeadingsFromMarkdown,
+  preprocessUnderlineTags,
+} from "@/lib/post-helpers";
 
 export async function generateMetadata({
   params,
@@ -37,17 +43,7 @@ export async function generateMetadata({
   const title = post.name;
   const description = post.summary ?? `Read "${post.name}" on PostSoma 2050.`;
   const canonicalUrl = `${SITE_URL}/post/${post.slug}`;
-  const firstImage = post.media.find((m) => m.kind === "image");
-  const isFirstImageNotion =
-    firstImage &&
-    (firstImage.url.includes("amazonaws.com") ||
-      firstImage.url.includes("notion.so") ||
-      firstImage.url.includes("X-Amz-Expires"));
-  const ogImage = firstImage
-    ? isFirstImageNotion && post.id
-      ? `${SITE_URL}/api/image?pageId=${post.id}&mediaIndex=0`
-      : firstImage.url
-    : `${SITE_URL}/no-future.jpg`;
+  const ogImage = getArticleOgImage(post);
 
   return {
     title,
@@ -84,26 +80,6 @@ export async function generateMetadata({
 
 export const revalidate = 604800; // 7 days fallback, rely primarily on On-Demand ISR Webhook
 export const dynamicParams = true; // Allow on-demand ISR for slugs not pre-built
-
-function getHeadingsFromMarkdown(markdown: string) {
-  const headingLines = markdown.match(/^(#{1,3})\s+(.*)$/gm) || [];
-  return headingLines.map((line) => {
-    const level = line.match(/^(#{1,3})/)?.[0].length || 0;
-    const text = line.replace(/^(#{1,3})\s+/, "");
-    const slug = text
-      .toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/[^\w\-\u4e00-\u9fa5]/g, "");
-    return { text, level, slug };
-  });
-}
-
-function preprocessUnderlineTags(md: string): string {
-  return md.replace(
-    /<u>([\s\S]*?)<\/u>/gi,
-    '<span class="border-b-2 border-cyan-500">$1</span>'
-  );
-}
 
 // Pre-render top 100 latest articles at build time to ensure instant 0.05s load time
 // while keeping build resource consumption low. Remaining older articles are rendered on-demand.
@@ -146,75 +122,8 @@ export default async function PostPage({
 
   const accent = CATEGORY_ACCENTS[post.category];
   const categorySlug = CATEGORY_SLUGS[post.category];
-
-  const firstImage = post.media.find((m) => m.kind === "image");
-  const isFirstImageNotion =
-    firstImage &&
-    (firstImage.url.includes("amazonaws.com") ||
-      firstImage.url.includes("notion.so") ||
-      firstImage.url.includes("X-Amz-Expires"));
-  const articleImage = firstImage
-    ? isFirstImageNotion && post.id
-      ? `${SITE_URL}/api/image?pageId=${post.id}&mediaIndex=0`
-      : firstImage.url
-    : `${SITE_URL}/no-future.jpg`;
-
-  const articleJsonLd = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "BlogPosting",
-        "@id": `${SITE_URL}/post/${post.slug}#article`,
-        "url": `${SITE_URL}/post/${post.slug}`,
-        "headline": post.name,
-        "description": post.summary ?? `Read "${post.name}" on PostSoma 2050.`,
-        "datePublished": post.publishedDate ?? undefined,
-        "keywords": post.tags.length > 0 ? post.tags.join(", ") : undefined,
-        "author": {
-          "@type": "Person",
-          "name": "postsoma-2050",
-          "url": `${SITE_URL}/about`
-        },
-        "publisher": {
-          "@type": "Organization",
-          "name": "PostSoma 2050",
-          "url": SITE_URL,
-          "logo": {
-            "@type": "ImageObject",
-            "url": `${SITE_URL}/logo.png`
-          }
-        },
-        "mainEntityOfPage": {
-          "@type": "WebPage",
-          "@id": `${SITE_URL}/post/${post.slug}`
-        },
-        "image": articleImage
-      },
-      {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": SITE_URL
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": post.category,
-            "item": `${SITE_URL}/${categorySlug}`
-          },
-          {
-            "@type": "ListItem",
-            "position": 3,
-            "name": post.name,
-            "item": `${SITE_URL}/post/${post.slug}`
-          }
-        ]
-      }
-    ]
-  };
+  const articleImage = getArticleOgImage(post);
+  const articleJsonLd = buildArticleJsonLd(post, categorySlug, articleImage);
 
   return (
     <div className="min-h-screen pb-24">
@@ -224,129 +133,18 @@ export default async function PostPage({
       />
       <TableOfContents headings={headings} />
 
-      <div className="mx-auto max-w-4xl px-0 sm:px-6 pt-6 sm:pt-12">
-        <header className="mb-12 text-center">
-          <Link
-            href={`/${categorySlug}`}
-            className="inline-flex items-center font-mono text-sm text-text-secondary hover:text-text-primary transition-colors"
-            style={{ color: accent }}
-          >
-            <RiArrowLeftLine className="w-4 h-4 mr-1" />
-            {post.category}
-          </Link>
-          <h1 className="mt-4 font-mono text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl">
-            {post.name}
-          </h1>
-          <div className="mt-2 flex flex-wrap items-center justify-center gap-2 font-mono text-sm text-text-secondary">
-            {post.publishedDate && <time>{post.publishedDate}</time>}
-            <span>·</span>
-            <span className="inline-flex items-center gap-1">
-              <RiTimerLine className="w-4 h-4 text-cyan-400" />
-              {readingTime} min read / {readingTime} 分鐘
-            </span>
-            {post.tags.length > 0 && (
-              <>
-                <span>·</span>
-                {post.tags.map((tag) => (
-                  <span key={tag}>#{tag}</span>
-                ))}
-              </>
-            )}
-          </div>
-        </header>
+      <div className="mx-auto max-w-[700px] px-4 sm:px-6 pt-6 sm:pt-14">
+        <PostHeader
+          post={post}
+          categorySlug={categorySlug}
+          readingTime={readingTime}
+        />
 
-        {/* Media section */}
-        {post.media.length > 0 && (
-          <section className="mb-10 mt-2 space-y-5">
-            {post.media.map((item, idx) => {
-              if (item.kind === "image") {
-                const isNotionInternal =
-                  item.url.includes("amazonaws.com") ||
-                  item.url.includes("notion.so") ||
-                  item.url.includes("X-Amz-Expires");
-                const imageUrl =
-                  isNotionInternal && post.id
-                    ? `/api/image?pageId=${post.id}&mediaIndex=${idx}`
-                    : item.url;
-
-                return (
-                  <div
-                    key={idx}
-                    className="relative w-full overflow-hidden rounded-lg"
-                    style={{
-                      border: "1px solid var(--border-subtle)",
-                      boxShadow: "0 0 18px 2px rgba(0, 240, 255, 0.12)",
-                    }}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={imageUrl}
-                      alt={item.name ?? "Post media"}
-                      className="w-full h-auto rounded-lg"
-                      loading="lazy"
-                    />
-                  </div>
-                );
-              }
-              if (item.kind === "video") {
-                return (
-                  <div
-                    key={idx}
-                    className="overflow-hidden rounded-lg"
-                    style={{ border: "1px solid var(--border-subtle)" }}
-                  >
-                    <video
-                      src={item.url}
-                      controls
-                      preload="metadata"
-                      className="w-full rounded-lg"
-                    >
-                      Your browser does not support video playback.
-                    </video>
-                  </div>
-                );
-              }
-              if (item.kind === "audio") {
-                return (
-                  <div
-                    key={idx}
-                    className="rounded-lg px-4 py-3"
-                    style={{
-                      border: "1px solid var(--border-subtle)",
-                      background: "rgba(255,255,255,0.03)",
-                    }}
-                  >
-                    {item.name && (
-                      <p className="mb-2 font-mono text-xs text-text-secondary flex items-center gap-1.5">
-                        <RiMusic2Line className="w-3.5 h-3.5 text-cyan-400" />
-                        <span>{item.name}</span>
-                      </p>
-                    )}
-                    <audio src={item.url} controls preload="metadata" className="w-full">
-                      Your browser does not support audio playback.
-                    </audio>
-                  </div>
-                );
-              }
-              return (
-                <a
-                  key={idx}
-                  href={item.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 rounded-lg px-4 py-3 font-mono text-sm text-text-secondary transition-colors hover:text-text-primary"
-                  style={{
-                    border: "1px solid var(--border-subtle)",
-                    background: "rgba(255,255,255,0.03)",
-                  }}
-                >
-                  <RiAttachment2 className="w-4 h-4 text-cyan-400" />
-                  <span>{item.name ?? "Download file"}</span>
-                </a>
-              );
-            })}
-          </section>
-        )}
+        <PostMediaGallery
+          media={post.media}
+          postId={post.id}
+          postName={post.name}
+        />
 
         <AICard rawSummary={post.aiSummary ?? ""} readingTime={readingTime} />
 
@@ -355,7 +153,7 @@ export default async function PostPage({
             <NotionRenderer blocks={blocks} accent={accent} />
           </article>
         ) : markdown ? (
-          <article className="prose prose-invert prose-lg max-w-none prose-headings:font-mono prose-a:text-cyan-400 hover:prose-a:text-cyan-300 prose-img:rounded-lg prose-img:mx-auto">
+          <article className="prose prose-lg max-w-none prose-headings:font-mono prose-headings:text-[var(--text-primary)] prose-a:text-[var(--accent-ai)] hover:prose-a:opacity-80 prose-img:rounded-xl prose-img:mx-auto">
             <ReactMarkdown
               remarkPlugins={[remarkGfm, remarkMath]}
               rehypePlugins={[rehypeRaw, rehypeSlug, rehypeKatex]}

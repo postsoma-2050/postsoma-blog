@@ -22,10 +22,10 @@ export default function NotionRenderer({
   return (
     <div
       className="
-        prose prose-invert prose-lg max-w-none
-        prose-headings:font-mono prose-headings:text-white
-        prose-a:text-cyan-400 hover:prose-a:text-cyan-300
-        prose-img:rounded-lg prose-img:mx-auto
+        prose prose-lg max-w-none
+        prose-headings:font-mono prose-headings:text-[var(--text-primary)]
+        prose-a:text-[var(--accent-ai)] hover:prose-a:opacity-80
+        prose-img:rounded-xl prose-img:mx-auto
       "
     >
       <BlockRenderer blocks={blocks} accent={accent} />

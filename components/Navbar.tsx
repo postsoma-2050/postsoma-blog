@@ -5,8 +5,10 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { RiMenu3Line, RiCloseLine } from "@remixicon/react";
+import { Search } from "lucide-react";
 import { useState } from "react";
 import { CATEGORY_SLUGS, type Category } from "@/lib/design-tokens";
+import { openSearchModal } from "@/components/SearchModal";
 
 const navLinks: { label: string; href: string }[] = [
   { label: "Home", href: "/" },
@@ -25,88 +27,59 @@ export default function Navbar() {
       initial={{ y: -16, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="sticky top-0 z-50 border-b border-[var(--border-subtle)] bg-bg/95 backdrop-blur-sm"
+      className="relative z-30 w-full border-b-[0.5px] border-[var(--border-subtle)] bg-[var(--bg-base)]/85 backdrop-blur-md"
     >
-      <nav
-        className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-3 sm:px-6"
-        aria-label="Main navigation"
-      >
-        {/* Logo */}
+      <div className="max-w-[760px] mx-auto px-6 h-14 flex items-center justify-between">
+        {/* POSTSOMA 2050 Logo: 左边缘与正文文章标题严格垂直对齐 */}
         <Link
           href="/"
-          className="group flex items-center gap-3 transition-all focus:outline-none focus:ring-2 focus:ring-accent-ai focus:ring-offset-2 focus:ring-offset-bg"
+          className="group flex items-center gap-2.5 sm:gap-3 transition-all focus:outline-none focus:ring-2 focus:ring-[var(--border-default)] rounded-lg"
           aria-label="PostSoma 2050 home"
         >
-          <div className="relative flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center overflow-hidden rounded-lg border border-cyan-500/30 bg-bg-secondary p-0.5 shadow-[0_0_12px_rgba(0,240,255,0.25)] transition-all duration-300 group-hover:border-cyan-400 group-hover:shadow-[0_0_18px_rgba(0,240,255,0.5)]">
+          <div className="relative flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center overflow-hidden rounded-lg border-[0.5px] border-[var(--border-subtle)] bg-[var(--bg-surface)] p-0.5 transition-all duration-200 group-hover:border-[var(--border-default)] shadow-sm">
             <Image
               src="/logo.png"
               alt="PostSoma Icon"
-              width={44}
-              height={44}
+              width={36}
+              height={36}
               className="h-full w-full object-contain"
               priority
             />
           </div>
           <div className="flex items-center">
-            <span className="font-mono text-base font-bold tracking-widest text-text-primary transition-colors group-hover:text-cyan-300 sm:text-lg">
-              POST<span className="text-cyan-400">SOMA</span>
+            <span className="font-mono text-base font-bold tracking-widest text-[var(--text-primary)] transition-opacity group-hover:opacity-85">
+              POST<span className="text-[var(--accent-ai)]">SOMA</span>
             </span>
-            <span className="ml-2 font-mono text-[10px] font-semibold tracking-wider text-cyan-400 border border-cyan-500/40 bg-cyan-950/60 px-1.5 py-0.5 rounded shadow-[0_0_8px_rgba(0,240,255,0.2)] sm:text-xs">
+            <span className="ml-2 font-mono text-[10px] font-semibold tracking-wider text-[var(--text-muted)] border-[0.5px] border-[var(--border-subtle)] bg-[var(--bg-surface)] px-1.5 py-0.5 rounded shadow-sm">
               2050
             </span>
           </div>
         </Link>
 
-        {/* Desktop nav */}
-        <ul className="hidden items-center gap-1 lg:flex">
-          {navLinks.map(({ label, href }) => {
-            const isActive =
-              href === "/"
-                ? pathname === "/"
-                : pathname.startsWith(href);
-            return (
-              <li key={href}>
-                <Link
-                  href={href}
-                  className="focus:outline-none focus-visible:ring-0"
-                >
-                  <motion.span
-                    className={`relative block px-3 py-2 font-mono text-sm transition-colors ${isActive
-                      ? "text-accent-ai"
-                      : "text-text-secondary hover:text-text-primary"
-                      }`}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    {label}
-                    {isActive && (
-                      <motion.span
-                        layoutId="navbar-underline"
-                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent-ai"
-                        style={{
-                          boxShadow: "0 0 12px 2px #00F0FF, 0 0 24px 4px rgba(0, 240, 255, 0.4)",
-                        }}
-                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                      />
-                    )}
-                  </motion.span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+        {/* Right side: Mobile only (<1024px) search + menu button */}
+        <div className="flex items-center gap-2 lg:hidden">
+          {/* Mobile Search Trigger Button */}
+          <button
+            type="button"
+            onClick={openSearchModal}
+            className="h-9 w-9 flex items-center justify-center rounded-lg border-[0.5px] border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-default)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--border-default)]"
+            aria-label="Search transmissions (⌘K)"
+          >
+            <Search className="w-4 h-4" />
+          </button>
 
-        {/* Mobile menu button */}
-        <button
-          type="button"
-          onClick={() => setMobileOpen((o) => !o)}
-          className="font-mono text-xs uppercase tracking-wider text-text-primary hover:text-accent-ai focus:outline-none lg:hidden px-3 h-11 flex items-center justify-center border border-[var(--border-subtle)] rounded transition-colors hover:border-accent-ai focus:ring-2 focus:ring-accent-ai focus:ring-offset-2 focus:ring-offset-bg"
-          aria-expanded={mobileOpen}
-          aria-label={mobileOpen ? "Close menu" : "Open menu"}
-        >
-          {mobileOpen ? <RiCloseLine className="w-5 h-5" /> : <RiMenu3Line className="w-5 h-5" />}
-        </button>
-      </nav>
+          {/* Mobile menu button */}
+          <button
+            type="button"
+            onClick={() => setMobileOpen((o) => !o)}
+            className="h-9 px-2.5 font-mono text-xs uppercase tracking-wider text-[var(--text-secondary)] hover:text-[var(--text-primary)] focus:outline-none flex items-center justify-center border-[0.5px] border-[var(--border-subtle)] rounded-lg transition-colors hover:border-[var(--border-default)] focus:ring-2 focus:ring-[var(--border-default)]"
+            aria-expanded={mobileOpen}
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          >
+            {mobileOpen ? <RiCloseLine className="w-4 h-4" /> : <RiMenu3Line className="w-4 h-4" />}
+          </button>
+        </div>
+      </div>
 
       {/* Mobile menu */}
       <motion.div
@@ -118,24 +91,27 @@ export default function Navbar() {
         transition={{ duration: 0.2 }}
         className="overflow-hidden border-t border-[var(--border-subtle)] lg:hidden"
       >
-        <ul className="flex flex-col gap-0 px-4 py-3">
-          {navLinks.map(({ label, href }) => {
-            const isActive =
-              href === "/" ? pathname === "/" : pathname.startsWith(href);
-            return (
-              <li key={href}>
-                <Link
-                  href={href}
-                  onClick={() => setMobileOpen(false)}
-                  className={`flex items-center py-3 w-full min-h-[44px] font-mono text-sm ${isActive ? "text-accent-ai" : "text-text-secondary"
-                    } hover:text-text-primary`}
-                >
-                  {label}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+        <div className="max-w-[760px] mx-auto px-6 py-3">
+          <ul className="flex flex-col gap-0">
+            {navLinks.map(({ label, href }) => {
+              const isActive =
+                href === "/" ? pathname === "/" : pathname.startsWith(href);
+              return (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex items-center py-3 w-full min-h-[44px] font-mono text-sm ${
+                      isActive ? "text-[var(--accent-ai)] font-semibold" : "text-[var(--text-secondary)]"
+                    } hover:text-[var(--text-primary)] transition-colors`}
+                  >
+                    {label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </motion.div>
     </motion.header>
   );

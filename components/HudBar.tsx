@@ -175,16 +175,8 @@ interface HudBarProps {
 function PanelBackdrop({ accentClass }: { accentClass: string }) {
   return (
     <>
-      <div
-        className="pointer-events-none absolute inset-0 opacity-10"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.05) 2px, rgba(255,255,255,0.05) 4px)",
-        }}
-        aria-hidden
-      />
-      <div className={`absolute top-0 bottom-0 left-0 w-1 ${accentClass} opacity-50`} />
-      <div className={`absolute top-0 bottom-0 right-0 w-1 ${accentClass} opacity-50`} />
+      <div className={`absolute top-0 bottom-0 left-0 w-0.5 ${accentClass} opacity-40`} />
+      <div className={`absolute top-0 bottom-0 right-0 w-0.5 ${accentClass} opacity-40`} />
     </>
   );
 }
@@ -210,13 +202,13 @@ function StatusPanel({
     : null;
 
   return (
-    <div className="relative flex flex-col justify-between min-h-[150px] md:h-auto h-auto p-4 md:p-5 text-emerald-400 font-mono gap-4 md:gap-3">
-      <PanelBackdrop accentClass="bg-emerald-500" />
+    <div className="relative flex flex-col justify-between min-h-[150px] md:h-auto h-auto p-4 md:p-5 font-mono text-[var(--text-primary)] gap-4 md:gap-3">
+      <PanelBackdrop accentClass="bg-[var(--accent-dot)]" />
 
       <div>
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-emerald-400/60 flex items-center gap-2">
-          <span className="h-1 w-1 rounded-full bg-emerald-400 animate-ping" />
-          SYSTEM_STATUS // LOGS
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-dot)]" />
+          System Status · Index Logs
         </span>
 
         {catEntries ? (
@@ -224,11 +216,11 @@ function StatusPanel({
           <ul className="mt-2.5 flex flex-col gap-1 text-[11px]">
             {catEntries.map(({ key, label, count, href }) => (
               <li key={key} className="flex items-center gap-3">
-                <span className="w-8 shrink-0 font-bold text-emerald-400">{key}</span>
-                <span className="flex-1 text-text-primary/70">{label}</span>
+                <span className="w-8 shrink-0 font-bold text-[var(--accent-philosophy)]">{key}</span>
+                <span className="flex-1 text-[var(--text-secondary)]">{label}</span>
                 <Link
                   href={href}
-                  className="tabular-nums text-emerald-300 hover:text-emerald-200 transition-colors font-semibold"
+                  className="tabular-nums text-[var(--text-primary)] hover:underline transition-colors font-semibold"
                 >
                   {count} nodes
                 </Link>
@@ -236,29 +228,29 @@ function StatusPanel({
             ))}
           </ul>
         ) : (
-          /* Fallback: original static rows */
+          /* Fallback: static rows */
           <ul className="mt-2.5 flex flex-col gap-1 text-[11px]">
             {[
-              { status: "ONLINE",  label: "Reasoning Core",        cls: "text-emerald-400" },
-              { status: "SYNCING", label: "Vector Index",           cls: "text-amber-400" },
-              { status: "FAILED",  label: "Turing Test",            cls: "text-red-400" },
-              { status: "OK",      label: `Total Nodes: ${postCount}`, cls: "text-emerald-400" },
-            ].map(({ status, label, cls }) => (
+              { status: "ONLINE",  label: "Reasoning Core" },
+              { status: "SYNCING", label: "Vector Index" },
+              { status: "FAILED",  label: "Turing Test" },
+              { status: "OK",      label: `Total Nodes: ${postCount}` },
+            ].map(({ status, label }) => (
               <li key={label} className="flex items-center gap-3">
-                <span className={`w-16 shrink-0 font-bold ${cls}`}>[{status}]</span>
-                <span className="text-text-primary/80">{label}</span>
+                <span className="w-16 shrink-0 font-bold text-[var(--text-muted)]">[{status}]</span>
+                <span className="text-[var(--text-secondary)]">{label}</span>
               </li>
             ))}
           </ul>
         )}
       </div>
 
-      <div className="relative z-10 border-t border-emerald-500/10 pt-2">
+      <div className="relative z-10 border-t border-[var(--border-subtle)] pt-2">
         <Link
           href="/ai-insights"
-          className="block text-center md:inline-block md:text-left text-[9px] uppercase tracking-widest text-emerald-400/50 hover:text-emerald-300 transition-colors"
+          className="block text-center md:inline-block md:text-left text-[9px] uppercase tracking-wider text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
         >
-          → ACCESS ARCHIVE CORES
+          → Access Archive Cores
         </Link>
       </div>
     </div>
@@ -268,21 +260,21 @@ function StatusPanel({
 function TickerPanel({ prices }: { prices: MarketPrices }) {
   const relTime = useRelativeTime(prices.updatedAt);
   return (
-    <div className="relative flex flex-col justify-between min-h-[150px] md:h-[160px] h-auto p-4 md:p-5 text-orange-400 font-mono gap-4 md:gap-0">
-      <PanelBackdrop accentClass="bg-orange-500" />
+    <div className="relative flex flex-col justify-between min-h-[150px] md:h-[160px] h-auto p-4 md:p-5 font-mono text-[var(--text-primary)] gap-4 md:gap-0">
+      <PanelBackdrop accentClass="bg-[var(--accent-blockchain)]" />
 
       <div>
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-orange-400/60">
-            MARKET_TICKER // LEDGER
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+            Market Ticker · Ledger
           </span>
           <span
             className={`text-[9px] tabular-nums ${
               prices.status === "error"
-                ? "text-red-400/50"
+                ? "text-red-500"
                 : prices.status === "loading"
-                ? "animate-pulse text-orange-400/30"
-                : "text-orange-400/30"
+                ? "animate-pulse text-[var(--text-muted)]"
+                : "text-[var(--text-muted)]"
             }`}
           >
             {prices.status === "loading"
@@ -299,22 +291,22 @@ function TickerPanel({ prices }: { prices: MarketPrices }) {
             { symbol: "ETH", value: prices.eth, desc: "Gas network core" },
           ].map((t) => (
             <div key={t.symbol} className="flex flex-col tabular-nums">
-              <span className="text-[9px] font-bold text-orange-400/50">{t.symbol}</span>
-              <span className="text-xl md:text-xl font-extrabold tracking-tight text-orange-400 mt-0.5">
+              <span className="text-[9px] font-bold text-[var(--text-muted)]">{t.symbol}</span>
+              <span className="text-xl md:text-xl font-extrabold tracking-tight text-[var(--text-primary)] mt-0.5">
                 {t.value}
               </span>
-              <span className="text-[8px] text-text-secondary/40">{t.desc}</span>
+              <span className="text-[8px] text-[var(--text-muted)]">{t.desc}</span>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="relative z-10 border-t border-orange-500/10 pt-2">
+      <div className="relative z-10 border-t border-[var(--border-subtle)] pt-2">
         <Link
           href="/blockchain"
-          className="block text-center md:inline-block md:text-left text-[9px] uppercase tracking-widest text-orange-400/50 hover:text-orange-300 transition-colors"
+          className="block text-center md:inline-block md:text-left text-[9px] uppercase tracking-wider text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
         >
-          → INTERROGATE LEDGER BLOCKS
+          → Inspect Ledger Blocks
         </Link>
       </div>
     </div>
@@ -323,18 +315,18 @@ function TickerPanel({ prices }: { prices: MarketPrices }) {
 
 function getFomoInterpretation(score: number): string {
   if (score >= 75) {
-    return "[!] SYSTEM WARNING: Irrational exuberance detected. High susceptibility to corrections.";
+    return "Market State: Extreme Greed. High susceptibility to corrections.";
   }
   if (score >= 55) {
-    return "[ ] MARKET STATE: Stable expansion. Capital flow is positive.";
+    return "Market State: Stable Expansion. Capital flow is positive.";
   }
   if (score >= 45) {
-    return "[ ] MARKET STATE: Equilibrium. System state is neutral.";
+    return "Market State: Equilibrium. System state is neutral.";
   }
   if (score >= 25) {
-    return "[ ] MARKET STATE: Anxiety spreading. Hedging protocols active.";
+    return "Market State: Anxiety spreading. Hedging protocols active.";
   }
-  return "[!] SYSTEM WARNING: Extreme fear. High potential for capitulation/buying windows.";
+  return "Market State: Extreme Fear. High potential for capitulation/buying windows.";
 }
 
 function SentimentPanel({ fomo }: { fomo: FomoData }) {
@@ -345,16 +337,16 @@ function SentimentPanel({ fomo }: { fomo: FomoData }) {
   const relTime = useRelativeTime(fomo.updatedAt);
 
   return (
-    <div className="relative flex flex-col justify-between min-h-[150px] md:h-[160px] h-auto p-4 md:p-5 text-yellow-400 font-mono gap-4 md:gap-0">
-      <PanelBackdrop accentClass="bg-yellow-500" />
+    <div className="relative flex flex-col justify-between min-h-[150px] md:h-[160px] h-auto p-4 md:p-5 font-mono text-[var(--text-primary)] gap-4 md:gap-0">
+      <PanelBackdrop accentClass="bg-[var(--accent-philosophy)]" />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
         <div>
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-yellow-400/60">
-              SENTIMENT_ANALYSIS // RATIO
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+              Market Sentiment · Ratio
             </span>
-            <span className="text-[9px] tabular-nums text-yellow-400/30">
+            <span className="text-[9px] tabular-nums text-[var(--text-muted)]">
               {fomo.status === "loading"
                 ? "fetching..."
                 : `${fomo.source}: ${relTime}${fomo.fallback ? " (fallback)" : ""}`}
@@ -364,22 +356,22 @@ function SentimentPanel({ fomo }: { fomo: FomoData }) {
             {CANDLES.map((c, i) => (
               <div key={i} className="flex flex-col items-center justify-end w-3">
                 <div
-                  className={`w-0.5 flex-shrink-0 ${c.green ? "bg-emerald-400/50" : "bg-red-400/50"}`}
+                  className={`w-0.5 flex-shrink-0 ${c.green ? "bg-emerald-500/50" : "bg-red-500/50"}`}
                   style={{ height: Math.max(1, c.top - 2), minHeight: 1 }}
                 />
                 <div
-                  className={`w-full rounded-sm ${c.green ? "bg-emerald-500/80" : "bg-red-500/80"}`}
+                  className={`w-full rounded-sm ${c.green ? "bg-emerald-500" : "bg-red-500"}`}
                   style={{ height: Math.max(4, c.body - 2), minHeight: 4 }}
                 />
                 <div
-                  className={`w-0.5 flex-shrink-0 ${c.green ? "bg-emerald-400/50" : "bg-red-400/50"}`}
+                  className={`w-0.5 flex-shrink-0 ${c.green ? "bg-emerald-500/50" : "bg-red-500/50"}`}
                   style={{ height: Math.max(1, c.bottom - 2), minHeight: 1 }}
                 />
               </div>
             ))}
             <div className="ml-3 flex flex-col justify-end h-full">
-              <p className="text-[8px] uppercase tracking-widest text-yellow-400/30">FOMO CLASS</p>
-              <p className="text-[11px] font-extrabold text-yellow-400 uppercase mt-0.5">
+              <p className="text-[8px] uppercase tracking-wider text-[var(--text-muted)]">FOMO Class</p>
+              <p className="text-[11px] font-bold text-[var(--text-primary)] uppercase mt-0.5">
                 {fomo.status === "loading" ? "loading..." : fomo.label}
               </p>
             </div>
@@ -389,25 +381,25 @@ function SentimentPanel({ fomo }: { fomo: FomoData }) {
         {/* Tactical visual score readouts */}
         <div className="flex flex-col justify-center">
           <div className="flex flex-col md:flex-row md:items-baseline md:justify-between text-[10px] mb-0.5">
-            <span className="text-yellow-400/50 uppercase tracking-wider text-[8px]">Index Score</span>
-            <span className="font-bold text-yellow-400 mt-0.5 md:mt-0">{score} / 100</span>
+            <span className="text-[var(--text-muted)] uppercase tracking-wider text-[8px]">Index Score</span>
+            <span className="font-bold text-[var(--text-primary)] mt-0.5 md:mt-0">{score} / 100</span>
           </div>
-          {/* Cyberpunk ASCII horizontal progress bar */}
-          <div className="text-[10px] sm:text-xs tracking-wider md:tracking-widest text-yellow-400/80 mb-1.5 tabular-nums truncate">
+          {/* ASCII horizontal progress bar */}
+          <div className="text-[10px] sm:text-xs tracking-wider md:tracking-widest text-[var(--accent-philosophy)] mb-1.5 tabular-nums truncate">
             [{barStr}]
           </div>
-          <p className="text-[8px] text-text-primary/70 leading-snug line-clamp-none md:line-clamp-2 italic">
+          <p className="text-[8px] text-[var(--text-secondary)] leading-snug line-clamp-none md:line-clamp-2 italic">
             {getFomoInterpretation(score)}
           </p>
         </div>
       </div>
 
-      <div className="relative z-10 border-t border-yellow-500/10 pt-2">
+      <div className="relative z-10 border-t border-[var(--border-subtle)] pt-2">
         <Link
           href="/investing"
-          className="block text-center md:inline-block md:text-left text-[9px] uppercase tracking-widest text-yellow-400/50 hover:text-yellow-300 transition-colors"
+          className="block text-center md:inline-block md:text-left text-[9px] uppercase tracking-wider text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
         >
-          → OPTIMIZE PORTFOLIO WEIGHTS
+          → Optimize Portfolio Weights
         </Link>
       </div>
     </div>
@@ -416,36 +408,32 @@ function SentimentPanel({ fomo }: { fomo: FomoData }) {
 
 function TerminalPanel() {
   return (
-    <div className="relative flex flex-col justify-between min-h-[150px] md:h-[160px] h-auto p-4 md:p-5 text-cyan-400 font-mono gap-4 md:gap-0">
-      <PanelBackdrop accentClass="bg-cyan-500" />
+    <div className="relative flex flex-col justify-between min-h-[150px] md:h-[160px] h-auto p-4 md:p-5 font-mono text-[var(--text-primary)] gap-4 md:gap-0">
+      <PanelBackdrop accentClass="bg-[var(--accent-ai)]" />
 
       <div>
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-cyan-400/60">
-          PHILOSOPHY_SHELL // SCRIPTURE
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+          Philosophy · Scripture
         </span>
-        <div className="mt-3 flex items-start text-xs text-cyan-400">
-          <span className="mr-2 font-bold select-none">&gt;</span>
+        <div className="mt-3 flex items-start text-xs text-[var(--text-primary)]">
+          <span className="mr-2 font-bold select-none text-[var(--accent-ai)]">&gt;</span>
           <div>
-            <p className="leading-relaxed text-text-primary/95 font-medium">
+            <p className="leading-relaxed text-[var(--text-primary)] font-medium">
               &quot;What has been will be again, what has been done will be done again; there is nothing new under the sun.&quot;
             </p>
-            <p className="mt-1 text-[9px] text-cyan-400/50 uppercase tracking-widest">
-              — Ecclesiastes 1:9 // RECURRING_CYCLE
+            <p className="mt-1 text-[9px] text-[var(--text-muted)] uppercase tracking-wider">
+              — Ecclesiastes 1:9 · Recurring Cycle
             </p>
           </div>
-          <span
-            className="ml-1 inline-block h-[1.1em] w-[0.55em] animate-blink bg-cyan-400 align-middle"
-            aria-hidden
-          />
         </div>
       </div>
 
-      <div className="relative z-10 border-t border-cyan-500/10 pt-2">
+      <div className="relative z-10 border-t border-[var(--border-subtle)] pt-2">
         <Link
           href="/philosophy"
-          className="block text-center md:inline-block md:text-left text-[9px] uppercase tracking-widest text-cyan-400/50 hover:text-cyan-300 transition-colors"
+          className="block text-center md:inline-block md:text-left text-[9px] uppercase tracking-wider text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
         >
-          → DECONSTRUCT WORLD THEORY
+          → Deconstruct World Theory
         </Link>
       </div>
     </div>
@@ -467,58 +455,58 @@ function MobileHudPanel({
   const barStr = "█".repeat(filledCount) + "░".repeat(emptyCount);
 
   return (
-    <div className="relative flex flex-col gap-4 p-4 text-orange-400 font-mono overflow-y-auto max-h-[75vh]">
-      <PanelBackdrop accentClass="bg-orange-500" />
+    <div className="relative flex flex-col gap-4 p-4 font-mono text-[var(--text-primary)] overflow-y-auto max-h-[75vh]">
+      <PanelBackdrop accentClass="bg-[var(--accent-dot)]" />
 
       {/* 1. Status Section */}
-      <div className="border-b border-orange-500/10 pb-3">
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-emerald-400/60 flex items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
-          SYSTEM_STATUS // LOGS
+      <div className="border-b border-[var(--border-subtle)] pb-3">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-dot)]" />
+          System Status · Logs
         </span>
-        <ul className="mt-2 flex flex-col gap-1 text-[11px] text-emerald-400">
+        <ul className="mt-2 flex flex-col gap-1 text-[11px]">
           <li className="flex items-center gap-3">
-            <span className="w-16 shrink-0 font-bold">[ONLINE]</span>
-            <span className="text-text-primary/80">Reasoning Core</span>
+            <span className="w-16 shrink-0 font-bold text-[var(--accent-philosophy)]">ONLINE</span>
+            <span className="text-[var(--text-secondary)]">Reasoning Core</span>
           </li>
           <li className="flex items-center gap-3">
-            <span className="w-16 shrink-0 font-bold">[OK]</span>
-            <span className="text-text-primary/80">Total Nodes: {postCount}</span>
+            <span className="w-16 shrink-0 font-bold text-[var(--accent-philosophy)]">OK</span>
+            <span className="text-[var(--text-secondary)]">Total Nodes: {postCount}</span>
           </li>
         </ul>
       </div>
 
       {/* 2. Ticker Section */}
-      <div className="border-b border-orange-500/10 pb-3">
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-orange-400/60">
-          MARKET_TICKER // LEDGER
+      <div className="border-b border-[var(--border-subtle)] pb-3">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+          Market Ticker · Ledger
         </span>
         <div className="mt-2 flex flex-col gap-1.5 text-xs">
           <div className="flex justify-between items-center">
-            <span className="text-orange-400/50">BTC:</span>
-            <span className="font-extrabold text-orange-400">{prices.btc}</span>
+            <span className="text-[var(--text-muted)]">BTC:</span>
+            <span className="font-bold text-[var(--text-primary)]">{prices.btc}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-orange-400/50">ETH:</span>
-            <span className="font-extrabold text-orange-400">{prices.eth}</span>
+            <span className="text-[var(--text-muted)]">ETH:</span>
+            <span className="font-bold text-[var(--text-primary)]">{prices.eth}</span>
           </div>
         </div>
       </div>
 
       {/* 3. Sentiment Section */}
-      <div className="border-b border-orange-500/10 pb-3">
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-yellow-400/60">
-          SENTIMENT_ANALYSIS // RATIO
+      <div className="border-b border-[var(--border-subtle)] pb-3">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+          Market Sentiment · Ratio
         </span>
         <div className="mt-2 flex flex-col gap-1">
-          <div className="flex justify-between text-[11px] text-yellow-400">
-            <span>FOMO CLASS: {fomo.label}</span>
-            <span className="font-bold">{score} / 100</span>
+          <div className="flex justify-between text-[11px]">
+            <span className="text-[var(--text-muted)]">FOMO Class: {fomo.label}</span>
+            <span className="font-bold text-[var(--text-primary)]">{score} / 100</span>
           </div>
-          <div className="text-[11px] tracking-widest text-yellow-400/80 mb-1">
-            [{barStr}]
+          <div className="text-[11px] tracking-wider text-[var(--accent-philosophy)] mb-1">
+            {barStr}
           </div>
-          <p className="text-[9px] text-text-primary/70 leading-snug italic whitespace-normal">
+          <p className="text-[9px] text-[var(--text-secondary)] leading-snug italic whitespace-normal">
             {getFomoInterpretation(score)}
           </p>
         </div>
@@ -526,13 +514,13 @@ function MobileHudPanel({
 
       {/* 4. Terminal Quote */}
       <div>
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-cyan-400/60">
-          PHILOSOPHY_SHELL // SCRIPTURE
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+          Philosophy · Scripture
         </span>
-        <div className="mt-2 text-xs text-text-primary/95 leading-relaxed">
+        <div className="mt-2 text-xs text-[var(--text-primary)] leading-relaxed">
           &quot;What has been will be again, what has been done will be done again; there is nothing new under the sun.&quot;
         </div>
-        <div className="mt-1 text-[9px] text-cyan-400/50 uppercase tracking-widest">
+        <div className="mt-1 text-[9px] text-[var(--text-muted)] uppercase tracking-wider">
           — Ecclesiastes 1:9
         </div>
       </div>
@@ -585,178 +573,166 @@ export default function HudBar({ postCount = 0, categoryCounts }: HudBarProps) {
     return () => document.removeEventListener("keydown", handler);
   }, []);
 
-  const segmentCls = (id: PanelId, color: string) => {
+  const segmentCls = (id: PanelId, isFirst = false) => {
     if (!isHome) {
-      return `select-none px-2 py-0.5 rounded font-mono text-[10px] leading-none text-text-secondary/50 cursor-default`;
+      return `select-none ${isFirst ? "pl-0 pr-1.5" : "px-1.5"} py-0.5 rounded font-mono text-[0.72rem] tracking-wider leading-none text-[var(--text-muted)] cursor-default`;
     }
-    return `cursor-pointer select-none px-2 py-0.5 rounded transition-colors duration-150 font-mono text-[10px] leading-none ${
+    return `cursor-pointer select-none ${isFirst ? "pl-0 pr-1.5" : "px-1.5"} py-0.5 rounded transition-colors duration-150 font-mono text-[0.72rem] tracking-wider leading-none ${
       activePanel === id
-        ? `${color} bg-white/5`
-        : `text-text-secondary/70 hover:${color}`
+        ? `text-[var(--text-primary)] bg-[var(--hover-highlight)]`
+        : `text-[var(--text-muted)] hover:text-[var(--text-primary)]`
     }`;
   };
 
   const btcLabel = prices.status === "loading" ? "loading..." : prices.btc;
 
-  // Active border glow class mapping
-  const activeShadowClass =
-    activePanel === "status"
-      ? "border-emerald-500/30 shadow-[0_20px_50px_rgba(16,185,129,0.12)]"
-      : activePanel === "ticker"
-      ? "border-orange-500/30 shadow-[0_20px_50px_rgba(249,115,22,0.12)]"
-      : activePanel === "sentiment"
-      ? "border-yellow-500/30 shadow-[0_20px_50px_rgba(234,179,8,0.12)]"
-      : activePanel === "terminal"
-      ? "border-cyan-500/30 shadow-[0_20px_50px_rgba(6,182,212,0.12)]"
-      : activePanel === "mobile-hud"
-      ? "border-orange-500/30 shadow-[0_20px_50px_rgba(249,115,22,0.12)]"
-      : "border-[var(--border-subtle)]";
+  // Active border class mapping
+  const activeShadowClass = "border-[var(--border-subtle)] shadow-xl";
 
   return (
     <div ref={containerRef} className="relative z-40">
       {/* ── Main HUD strip ─────────────────────────────────────────────── */}
-      <div className="h-8 overflow-hidden border-b border-[var(--border-subtle)] bg-[#0d0d0d]/95 backdrop-blur-sm">
-        <div className="hud-ticker flex h-full items-center gap-0 whitespace-nowrap px-2 sm:px-4">
+      <div className="w-full border-b-[0.5px] border-[var(--border-subtle)] bg-[var(--bg-base)]/80 backdrop-blur-md">
+        <div className="max-w-[760px] mx-auto px-6 py-1.5 flex items-center justify-between font-mono text-[0.72rem] tracking-wider text-[var(--text-muted)]">
+          {/* ● ONLINE、NODES、BTC、FOMO 左侧指标群 */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* ● ONLINE segment */}
+            {isHome ? (
+              <button
+                type="button"
+                aria-label="System Status panel"
+                aria-expanded={activePanel === "status"}
+                onClick={() => toggle("status")}
+                className={segmentCls("status", true)}
+              >
+                <span className="text-[var(--accent-dot)] text-[8px] mr-1.5 animate-pulse">●</span>
+                <span>ONLINE</span>
+              </button>
+            ) : (
+              <span className={segmentCls("status", true)}>
+                <span className="text-[var(--accent-dot)] opacity-60 text-[8px] mr-1.5">●</span>
+                <span>ONLINE</span>
+              </span>
+            )}
 
-          {/* ● ONLINE segment */}
-          {isHome ? (
-            <button
-              type="button"
-              aria-label="System Status panel"
-              aria-expanded={activePanel === "status"}
-              onClick={() => toggle("status")}
-              className={segmentCls("status", "text-emerald-400")}
-            >
-              <span className="text-emerald-400">●</span>
-              <span className="ml-1 text-emerald-400/80">ONLINE</span>
-            </button>
-          ) : (
-            <span className={segmentCls("status", "text-emerald-400")}>
-              <span className="text-emerald-400/60">●</span>
-              <span className="ml-1 text-text-secondary/50">ONLINE</span>
-            </span>
-          )}
+            <span className="text-[var(--border-subtle)] select-none hidden sm:inline">│</span>
 
-          <span className="mx-1.5 text-white/10 select-none hidden sm:inline">│</span>
+            {/* NODES */}
+            {isHome ? (
+              <button
+                type="button"
+                aria-label="System Status panel"
+                aria-expanded={activePanel === "status"}
+                onClick={() => toggle("status")}
+                className={`${segmentCls("status")} hidden sm:inline-flex`}
+              >
+                NODES:&nbsp;<span className="text-[var(--text-secondary)]">{postCount}</span>
+              </button>
+            ) : (
+              <span className={`${segmentCls("status")} hidden sm:inline`}>
+                NODES:&nbsp;<span className="text-[var(--text-secondary)]">{postCount}</span>
+              </span>
+            )}
 
-          {/* NODES */}
-          {isHome ? (
-            <button
-              type="button"
-              aria-label="System Status panel"
-              aria-expanded={activePanel === "status"}
-              onClick={() => toggle("status")}
-              className={`${segmentCls("status", "text-emerald-400")} hidden sm:inline-flex`}
-            >
-              NODES:&nbsp;{postCount}
-            </button>
-          ) : (
-            <span className={`${segmentCls("status", "text-emerald-400")} hidden sm:inline`}>
-              NODES:&nbsp;{postCount}
-            </span>
-          )}
+            <span className="text-[var(--border-subtle)] select-none hidden sm:inline">│</span>
 
-          <span className="mx-1.5 text-white/10 select-none hidden sm:inline">│</span>
+            {/* BTC */}
+            {isHome ? (
+              <button
+                type="button"
+                aria-label="Ticker panel"
+                aria-expanded={activePanel === "ticker"}
+                onClick={() => toggle("ticker")}
+                className={`${segmentCls("ticker")} hidden sm:inline-flex`}
+              >
+                BTC:&nbsp;<span className="text-[var(--text-secondary)]">{btcLabel}</span>
+                <span className="ml-0.5 text-[8px] opacity-25">▾</span>
+              </button>
+            ) : (
+              <span className={`${segmentCls("ticker")} hidden sm:inline`}>
+                BTC:&nbsp;<span className="text-[var(--text-secondary)]">{btcLabel}</span>
+              </span>
+            )}
 
-          {/* BTC */}
-          {isHome ? (
-            <button
-              type="button"
-              aria-label="Ticker panel"
-              aria-expanded={activePanel === "ticker"}
-              onClick={() => toggle("ticker")}
-              className={`${segmentCls("ticker", "text-orange-400")} hidden sm:inline-flex`}
-            >
-              BTC:&nbsp;{btcLabel}
-              <span className="ml-0.5 text-[8px] opacity-25">▾</span>
-            </button>
-          ) : (
-            <span className={`${segmentCls("ticker", "text-orange-400")} hidden sm:inline`}>
-              BTC:&nbsp;{btcLabel}
-            </span>
-          )}
+            <span className="text-[var(--border-subtle)] select-none hidden sm:inline">│</span>
 
-          <span className="mx-1.5 text-white/10 select-none hidden sm:inline">│</span>
+            {/* FOMO */}
+            {isHome ? (
+              <button
+                type="button"
+                aria-label="Market Sentiment panel"
+                aria-expanded={activePanel === "sentiment"}
+                onClick={() => toggle("sentiment")}
+                className={segmentCls("sentiment")}
+              >
+                FOMO:&nbsp;<span className="text-[var(--text-secondary)]">{fomo.status === "loading" ? "loading..." : fomo.label}</span>
+              </button>
+            ) : (
+              <span className={segmentCls("sentiment")}>
+                FOMO:&nbsp;<span className="text-[var(--text-secondary)]">{fomo.status === "loading" ? "loading..." : fomo.label}</span>
+              </span>
+            )}
 
-          {/* FOMO */}
-          {isHome ? (
-            <button
-              type="button"
-              aria-label="Market Sentiment panel"
-              aria-expanded={activePanel === "sentiment"}
-              onClick={() => toggle("sentiment")}
-              className={segmentCls("sentiment", "text-yellow-400")}
-            >
-              FOMO:&nbsp;{fomo.status === "loading" ? "loading..." : fomo.label}
-            </button>
-          ) : (
-            <span className={segmentCls("sentiment", "text-yellow-400")}>
-              FOMO:&nbsp;{fomo.status === "loading" ? "loading..." : fomo.label}
-            </span>
-          )}
+            {/* [->] Mobile expand button */}
+            {isHome ? (
+              <button
+                type="button"
+                aria-label="Expand HUD panel"
+                aria-expanded={activePanel === "mobile-hud"}
+                onClick={() => toggle("mobile-hud")}
+                className="lg:hidden select-none px-2 py-0.5 rounded font-mono text-[0.72rem] tracking-wider leading-none text-[var(--text-muted)] hover:text-[var(--text-primary)] focus:outline-none"
+              >
+                {activePanel === "mobile-hud" ? "[←]" : "[→]"}
+              </button>
+            ) : (
+              <span className="lg:hidden select-none px-2 py-0.5 rounded font-mono text-[0.72rem] tracking-wider leading-none text-[var(--text-muted)] opacity-60 cursor-default">
+                {"[→]"}
+              </span>
+            )}
+          </div>
 
-          <span className="mx-1.5 text-white/10 select-none lg:hidden xl:inline">│</span>
+          {/* 右侧经文引用，右边缘与文章列表右侧严格对齐 */}
+          <div className="flex items-center gap-2">
+            {isHome ? (
+              <button
+                type="button"
+                aria-label="Terminal panel"
+                aria-expanded={activePanel === "terminal"}
+                onClick={() => toggle("terminal")}
+                className={`${segmentCls("terminal")} hidden lg:inline-flex truncate`}
+              >
+                <span className="opacity-40 mr-1">&gt;</span>
+                Ecclesiastes 1:9
+              </button>
+            ) : (
+              <span className={`${segmentCls("terminal")} hidden lg:inline text-[var(--text-muted)] truncate`}>
+                <span className="opacity-30 mr-1">&gt;</span>
+                Ecclesiastes 1:9
+              </span>
+            )}
 
-          {/* [->] Mobile expand button */}
-          {isHome ? (
-            <button
-              type="button"
-              aria-label="Expand HUD panel"
-              aria-expanded={activePanel === "mobile-hud"}
-              onClick={() => toggle("mobile-hud")}
-              className="lg:hidden select-none px-2 py-0.5 rounded font-mono text-[10px] leading-none text-orange-400 hover:text-orange-300 focus:outline-none"
-            >
-              {activePanel === "mobile-hud" ? "[<-]" : "[->]"}
-            </button>
-          ) : (
-            <span className="lg:hidden select-none px-2 py-0.5 rounded font-mono text-[10px] leading-none text-text-secondary/50 cursor-default">
-              {"[->]"}
-            </span>
-          )}
-
-          {/* Terminal quote */}
-          {isHome ? (
-            <button
-              type="button"
-              aria-label="Terminal panel"
-              aria-expanded={activePanel === "terminal"}
-              onClick={() => toggle("terminal")}
-              className={`${segmentCls("terminal", "text-cyan-400")} hidden lg:inline-flex`}
-            >
-              <span className="text-cyan-400/60 mr-0.5">&gt;</span>
-              &nbsp;Ecclesiastes 1:9
-            </button>
-          ) : (
-            <span className={`${segmentCls("terminal", "text-cyan-400")} hidden lg:inline`}>
-              <span className="text-text-secondary/30 mr-0.5">&gt;</span>
-              &nbsp;Ecclesiastes 1:9
-            </span>
-          )}
-
-          {/* Spacer so the strip looks balanced on wide screens */}
-          <span className="flex-1" />
-
-          {activePanel && isHome && (
-            <button
-              type="button"
-              aria-label="Close panel"
-              onClick={() => setActivePanel(null)}
-              className="ml-2 px-2 font-mono text-[10px] text-text-secondary/50 hover:text-text-primary transition-colors"
-            >
-              [×]
-            </button>
-          )}
+            {activePanel && isHome && (
+              <button
+                type="button"
+                aria-label="Close panel"
+                onClick={() => setActivePanel(null)}
+                className="px-1.5 py-0.5 font-mono text-[10px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors rounded border-[0.5px] border-[var(--border-subtle)] bg-[var(--bg-surface)]"
+              >
+                ✕
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
       {/* ── Large drop-down overlay panel (Only rendered on the homepage) ── */}
       {activePanel && isHome && (
         <div
-          className={`absolute left-0 right-0 top-full z-50 border-b border-t-0 bg-[#0f0f0f]/98 backdrop-blur-md transition-all duration-300 ${activeShadowClass}`}
+          className="absolute left-0 right-0 top-full z-50 border-b-[0.5px] border-[var(--border-subtle)] border-t-0 bg-[var(--bg-surface)] backdrop-blur-md shadow-2xl transition-all duration-300"
           role="dialog"
           aria-label="HUD detail panel"
         >
-          <div className="mx-auto max-w-6xl">
+          <div className="mx-auto max-w-[760px] px-6">
             {activePanel === "status"    && <StatusPanel postCount={postCount} categoryCounts={categoryCounts} />}
             {activePanel === "ticker"    && <TickerPanel prices={prices} />}
             {activePanel === "sentiment" && <SentimentPanel fomo={fomo} />}

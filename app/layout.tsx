@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono, Inter } from "next/font/google";
-import Link from "next/link";
 import Script from "next/script";
-import { Suspense } from "react";
 import "./globals.css";
 import "katex/dist/katex.min.css";
 import Navbar from "@/components/Navbar";
 import HudBar from "@/components/HudBar";
+import FloatingDock from "@/components/FloatingDock";
+import SearchModal, { type SearchablePost } from "@/components/SearchModal";
 import BodyRouteClass from "@/components/BodyRouteClass";
-import PageTransitionLoader from "@/components/PageTransitionLoader";
+import Footer from "@/components/Footer";
 import { getPublishedPosts, getArticleCountByCategory } from "@/lib/notion";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -108,6 +108,17 @@ export default async function RootLayout({
   ]);
   const postCount = posts.length;
 
+  // Lightweight posts payload for search modal (name, slug, category, summary, publishedDate, tags)
+  // Ensures full markdown and heavy fields are stripped to preserve initial load performance
+  const searchablePosts: SearchablePost[] = posts.map((p) => ({
+    name: p.name,
+    slug: p.slug,
+    category: p.category,
+    summary: p.summary,
+    publishedDate: p.publishedDate,
+    tags: p.tags,
+  }));
+
   return (
     <html lang="en" className="dark">
       <head>
@@ -133,44 +144,13 @@ export default async function RootLayout({
       <body
         className={`${jetbrainsMono.variable} ${inter.variable} min-h-screen bg-bg font-sans text-text-primary antialiased`}
       >
-        <Suspense fallback={null}>
-          <PageTransitionLoader />
-        </Suspense>
         <BodyRouteClass />
+        <SearchModal posts={searchablePosts} />
         <Navbar />
         <HudBar postCount={postCount} categoryCounts={categoryCounts} />
-        <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6">{children}</main>
-        <footer className="relative z-10 mt-24 border-t border-white/5 py-12 text-center">
-          <div className="flex flex-col items-center space-y-4 font-mono text-sm tracking-wider">
-            <p className="text-cyan-400/90 drop-shadow-[0_0_5px_rgba(0,240,255,0.5)]">
-              At PostSoma-2050,
-            </p>
-            <p className="text-gray-500">Together, we gaze into the abyss,</p>
-            <p className="text-gray-500">
-              Rediscovering the essence of our existence.
-            </p>
-            
-            {/* Machine & E-E-A-T Navigation links */}
-            <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-gray-400 pt-4">
-              <Link href="/about" className="hover:text-cyan-400 transition-colors">
-                [ About & E-E-A-T ]
-              </Link>
-              <a href="/llms.txt" target="_blank" rel="noopener noreferrer" className="hover:text-cyan-400 transition-colors">
-                [ llms.txt ]
-              </a>
-              <a href="/llms-full.txt" target="_blank" rel="noopener noreferrer" className="hover:text-cyan-400 transition-colors">
-                [ llms-full.txt ]
-              </a>
-              <a href="/sitemap.xml" target="_blank" rel="noopener noreferrer" className="hover:text-cyan-400 transition-colors">
-                [ Sitemap ]
-              </a>
-            </div>
-
-            <p className="mt-8 text-[10px] uppercase tracking-widest text-gray-700">
-              © 2050 PostSoma-2050. All rights reserved. Built by postsoma-2050.
-            </p>
-          </div>
-        </footer>
+        <FloatingDock />
+        <main className="mx-auto max-w-[760px] px-6 py-8">{children}</main>
+        <Footer />
       </body>
     </html>
   );

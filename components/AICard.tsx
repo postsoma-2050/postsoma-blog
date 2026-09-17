@@ -1,6 +1,6 @@
 "use client";
 
-import { RiCpuLine, RiFlashlightLine, RiNodeTree, RiCompass3Line, RiAlignLeft } from "@remixicon/react";
+import { RiCompass3Line, RiAlignLeft, RiFlashlightLine, RiNodeTree } from "@remixicon/react";
 
 interface AISummaryData {
   keyTakeaway?: string;
@@ -25,7 +25,7 @@ export default function AICard({ rawSummary, readingTime }: AICardProps) {
   try {
     data = JSON.parse(rawSummary);
     isJson = typeof data === "object" && data !== null;
-  } catch (e) {
+  } catch {
     isJson = false;
   }
 
@@ -33,37 +33,31 @@ export default function AICard({ rawSummary, readingTime }: AICardProps) {
   if (isJson && data) {
     const takeaway = data?.keyTakeaway || data?.key_takeaway;
     const points = data?.keyPoints || data?.key_points;
-    const guide = data?.readingGuide || data?.reading_guide || (readingTime ? `預計閱讀 ${readingTime} 分鐘` : undefined);
+    const guide =
+      data?.readingGuide ||
+      data?.reading_guide ||
+      (readingTime ? `Estimated read: ${readingTime} min` : undefined);
 
     if (!takeaway && (!points || points.length === 0) && !guide) {
       return null;
     }
 
     return (
-      <section 
-        className="relative mb-10 overflow-hidden rounded border border-accent-ai/30 bg-[#161d20]/50 p-4 sm:p-6 backdrop-blur-sm transition-all duration-300 hover:border-accent-ai/50"
-        style={{
-          boxShadow: "0 0 20px -5px rgba(0, 240, 255, 0.15)",
-        }}
+      <section
+        className="my-10 rounded-[24px] border-[0.5px] border-[var(--summary-border)] bg-[var(--summary-bg)] backdrop-blur-md shadow-[var(--card-inset)] p-5 sm:p-6 transition-colors"
+        aria-label="Executive Summary"
       >
-        <div className="absolute -left-12 -top-12 h-24 w-24 rounded-full bg-accent-ai/10 blur-xl pointer-events-none" />
-        <div className="absolute -right-12 -bottom-12 h-24 w-24 rounded-full bg-accent-philosophy/5 blur-xl pointer-events-none" />
-
-        {/* Cyberpunk Top Bar */}
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-4 border-b border-white/5 pb-4">
+        {/* Top Bar */}
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border-subtle)] pb-3.5">
           <div className="flex items-center gap-2">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-ai opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-ai"></span>
-            </span>
-            <span className="font-mono text-xs uppercase tracking-widest text-accent-ai flex items-center gap-1.5">
-              <RiCpuLine className="w-4 h-4 animate-pulse" />
-              AI Quantum Insights // 智能導讀
+            <RiAlignLeft className="w-4 h-4 text-[var(--text-muted)]" />
+            <span className="font-mono text-xs uppercase tracking-wider text-[var(--text-primary)] font-semibold">
+              Executive Summary · 導讀綱要
             </span>
           </div>
           {guide && (
-            <div className="flex items-center gap-1.5 font-mono text-[11px] text-text-secondary bg-white/5 px-2.5 py-1 rounded border border-white/5">
-              <RiCompass3Line className="w-3.5 h-3.5 text-accent-philosophy" />
+            <div className="flex items-center gap-1.5 font-mono text-[11px] text-[var(--text-muted)]">
+              <RiCompass3Line className="w-3.5 h-3.5 opacity-70" />
               <span>{guide}</span>
             </div>
           )}
@@ -71,12 +65,12 @@ export default function AICard({ rawSummary, readingTime }: AICardProps) {
 
         {/* Key Takeaway */}
         {takeaway && (
-          <div className="space-y-2">
-            <h4 className="font-mono text-xs font-semibold uppercase tracking-wider text-text-primary/75 flex items-center gap-1.5">
-              <RiFlashlightLine className="w-3.5 h-3.5 text-accent-ai" />
-              Core Takeaway / 核心提煉
+          <div className="space-y-1.5">
+            <h4 className="font-mono text-[11px] font-medium uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-1.5">
+              <RiFlashlightLine className="w-3.5 h-3.5 opacity-70" />
+              Core Takeaway
             </h4>
-            <p className="font-sans text-[15px] leading-relaxed text-text-primary pl-4 border-l border-accent-ai/30">
+            <p className="font-sans text-[0.98rem] leading-[1.7] text-[var(--text-secondary)] pl-3.5 border-l-2 border-[var(--border-default)]">
               {takeaway}
             </p>
           </div>
@@ -84,18 +78,20 @@ export default function AICard({ rawSummary, readingTime }: AICardProps) {
 
         {/* Thought Nodes */}
         {points && points.length > 0 && (
-          <div className="mt-5 space-y-3">
-            <h4 className="font-mono text-xs font-semibold uppercase tracking-wider text-text-primary/75 flex items-center gap-1.5">
-              <RiNodeTree className="w-3.5 h-3.5 text-accent-philosophy" />
-              Thought Nodes / 思維要點
+          <div className="mt-5 space-y-2.5">
+            <h4 className="font-mono text-[11px] font-medium uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-1.5">
+              <RiNodeTree className="w-3.5 h-3.5 opacity-70" />
+              Key Insights
             </h4>
-            <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-4">
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pl-3.5">
               {points.map((point, index) => (
-                <li 
+                <li
                   key={index}
-                  className="flex items-start gap-2.5 rounded bg-white/[0.02] p-2.5 border border-white/5 font-sans text-sm text-text-secondary leading-relaxed hover:bg-white/[0.04] transition-colors"
+                  className="flex items-start gap-2 font-sans text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed"
                 >
-                  <span className="font-mono text-xs text-accent-ai mt-0.5">0{index + 1}.</span>
+                  <span className="font-mono text-xs text-[var(--text-muted)] shrink-0 mt-0.5">
+                    0{index + 1}.
+                  </span>
                   <span>{point}</span>
                 </li>
               ))}
@@ -108,34 +104,27 @@ export default function AICard({ rawSummary, readingTime }: AICardProps) {
 
   // 2. Plain Text Summary Rendering
   return (
-    <section 
-      className="relative mb-10 overflow-hidden rounded border border-accent-ai/20 bg-neutral-900/40 p-4 sm:p-5 backdrop-blur-sm transition-all duration-300 hover:border-accent-ai/35"
-      style={{
-        boxShadow: "0 0 16px -6px rgba(0, 240, 255, 0.1)",
-      }}
+    <section
+      className="my-10 rounded-[24px] border-[0.5px] border-[var(--summary-border)] bg-[var(--summary-bg)] backdrop-blur-md shadow-[var(--card-inset)] p-5 sm:p-6 transition-colors"
+      aria-label="Executive Summary"
     >
-      <div className="absolute -left-12 -top-12 h-20 w-20 rounded-full bg-accent-ai/5 blur-xl pointer-events-none" />
-
-      {/* Cyberpunk Top Bar */}
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-4 border-b border-white/5 pb-3">
+      {/* Top Bar */}
+      <div className="mb-3.5 flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border-subtle)] pb-3">
         <div className="flex items-center gap-2">
-          <span className="relative flex h-1.5 w-1.5">
-            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-accent-ai/60"></span>
-          </span>
-          <span className="font-mono text-xs uppercase tracking-widest text-accent-ai/80 flex items-center gap-1.5">
-            <RiAlignLeft className="w-3.5 h-3.5" />
-            Executive Summary // 內容大綱
+          <RiAlignLeft className="w-4 h-4 text-[var(--text-muted)]" />
+          <span className="font-mono text-xs uppercase tracking-wider text-[var(--text-primary)] font-semibold">
+            Executive Summary · 內容大綱
           </span>
         </div>
         {readingTime && (
-          <div className="flex items-center gap-1.5 font-mono text-[11px] text-text-secondary bg-white/5 px-2 py-0.5 rounded border border-white/5">
-            <RiCompass3Line className="w-3 h-3 text-accent-philosophy" />
-            <span>預計閱讀 {readingTime} 分鐘</span>
+          <div className="flex items-center gap-1.5 font-mono text-[11px] text-[var(--text-muted)]">
+            <RiCompass3Line className="w-3.5 h-3.5 opacity-70" />
+            <span>約 {readingTime} 分鐘閱讀</span>
           </div>
         )}
       </div>
 
-      <p className="font-sans text-[14px] leading-relaxed text-text-secondary pl-3 border-l border-accent-ai/20">
+      <p className="font-sans text-[0.98rem] leading-[1.7] text-[var(--text-secondary)] pl-3.5 border-l-2 border-[var(--border-default)]">
         {rawSummary}
       </p>
     </section>

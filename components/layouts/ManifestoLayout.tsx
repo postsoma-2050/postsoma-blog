@@ -3,8 +3,9 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import PostCard from "@/components/PostCard";
+import SubCategoryFilter, { ALL_LABEL } from "@/components/SubCategoryFilter";
 import type { Post } from "@/lib/posts";
-import { CATEGORY_ACCENTS, type Category } from "@/lib/design-tokens";
+import { CATEGORY_ACCENTS, toEnglishSubCategory, type Category } from "@/lib/design-tokens";
 
 type ManifestoLayoutProps = {
   title: string;
@@ -18,91 +19,77 @@ export default function ManifestoLayout({
   posts,
 }: ManifestoLayoutProps) {
   const accent = CATEGORY_ACCENTS[category];
-  const uniqueCategories = useMemo(
+  const subCategories = useMemo(
     () =>
-      [
-        "All",
-        ...Array.from(
-          new Set(
-            posts.map((p) => p.subCategory).filter((x): x is string => !!x)
-          )
-        ),
-      ],
+      Array.from(
+        new Set(posts.map((p) => p.subCategory?.trim()).filter((x): x is string => !!x))
+      ),
     [posts]
   );
-  const [activeFilter, setActiveFilter] = useState("All");
+  const [selectedSub, setSelectedSub] = useState(ALL_LABEL);
 
   const filteredPosts =
-    activeFilter === "All"
+    selectedSub === ALL_LABEL
       ? posts
-      : posts.filter((post) => post.subCategory === activeFilter);
+      : posts.filter((post) => {
+          if (!post.subCategory) return false;
+          if (post.subCategory === selectedSub) return true;
+          const en = toEnglishSubCategory(post.subCategory, category);
+          const selEn = toEnglishSubCategory(selectedSub, category) || selectedSub;
+          return en === selEn || en === selectedSub;
+        });
 
   return (
-    <div className="mx-auto max-w-2xl space-y-16">
+    <div className="mx-auto max-w-[760px] space-y-8">
+      {/* Header */}
       <motion.header
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center"
+        transition={{ duration: 0.2 }}
+        className="border-b border-[var(--border-subtle)] pb-6"
       >
-        <h1
-          className="font-mono text-4xl font-semibold tracking-tight sm:text-5xl"
-          style={{ color: accent }}
-        >
+        <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-[var(--text-muted)] mb-2">
+          <span>Philosophy &amp; Consciousness</span>
+          <span>·</span>
+          <span>{posts.length} Inquiries</span>
+        </div>
+        <h1 className="font-sans text-3xl sm:text-4xl font-semibold tracking-tight text-[var(--text-primary)]">
           {title}
         </h1>
-        <p className="mt-4 font-sans text-lg text-text-secondary">
-          Single column. Thought as artifact.
+        <p className="mt-2 text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
+          Exploring consciousness, existential risk, and epistemic frameworks for post-singularity humanity.
         </p>
       </motion.header>
 
-      {/* Green Terminal Filter */}
-      {uniqueCategories.length > 1 && (
-        <div className="flex flex-wrap justify-center gap-3 px-4 overflow-x-auto py-2">
-          {uniqueCategories.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => setActiveFilter(cat)}
-              className={`
-                shrink-0 rounded-full border px-4 py-1.5 font-mono text-sm transition-all duration-300
-                ${activeFilter === cat
-                  ? "border-green-500 text-green-400 shadow-[0_0_10px_rgba(74,222,128,0.2)] bg-green-900/10"
-                  : "border-gray-800 text-gray-500 hover:border-green-900 hover:text-green-300"}
-              `}
-            >
-              {cat === "All" ? "[ ALL ]" : `[ ${cat.toUpperCase()} ]`}
-            </button>
-          ))}
-        </div>
+      {/* Sub Category Filter */}
+      {subCategories.length > 0 && (
+        <SubCategoryFilter
+          subCategories={subCategories}
+          selected={selectedSub}
+          onSelect={setSelectedSub}
+          accent={accent}
+        />
       )}
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.15 }}
-        className="space-y-12"
-      >
+      {/* Magazine Flow */}
+      <div className="divide-y divide-[var(--border-subtle)]">
         {filteredPosts.length === 0 ? (
-          <p className="font-sans text-center text-text-secondary">
-            {posts.length === 0
-              ? "No posts yet."
-              : "No posts in this section."}
+          <p className="py-12 font-sans text-center text-[var(--text-secondary)]">
+            No inquiries recorded in this section.
           </p>
         ) : (
           filteredPosts.map((post, i) => (
-            <motion.article
+            <motion.div
               key={post.slug}
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.08 * i }}
-              className="border-l-4 border-[var(--border-subtle)] pl-6"
-              style={{ borderLeftColor: accent }}
+              transition={{ delay: Math.min(0.04 * i, 0.3) }}
             >
-              <PostCard post={post} accent={accent} size="feature" />
-            </motion.article>
+              <PostCard post={post} accent={accent} size="stream" />
+            </motion.div>
           ))
         )}
-      </motion.div>
+      </div>
     </div>
   );
 }

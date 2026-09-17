@@ -111,10 +111,10 @@ export default function TableOfContents({
           onKeyDown={handleTabKeyDown}
           className="
             flex h-12 w-10 cursor-pointer items-center justify-center
-            rounded-l-lg border-b border-l border-t border-cyan-500/30
-            bg-gray-900/80 shadow-[0_0_15px_rgba(0,240,255,0.1)]
+            rounded-l-lg border-b border-l border-t border-[var(--border-subtle)]
+            bg-[var(--bg-raised)] shadow-lg
             backdrop-blur-md
-            focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900
+            focus:outline-none focus:ring-2 focus:ring-[var(--border-default)]
             active:scale-95 transition-transform
           "
           aria-label={isOpen ? "Close table of contents" : "Open table of contents"}
@@ -122,7 +122,7 @@ export default function TableOfContents({
           aria-controls="neural-index-drawer"
         >
           <svg
-            className={`h-5 w-5 text-cyan-400 transition-transform duration-300 ${isOpen ? "rotate-180" : "animate-pulse"}`}
+            className={`h-5 w-5 text-[var(--text-secondary)] transition-transform duration-300 ${isOpen ? "rotate-180" : "animate-pulse"}`}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -142,12 +142,12 @@ export default function TableOfContents({
           id="neural-index-drawer"
           className="
             w-72 max-w-[calc(100vw-60px)] max-h-[60vh] overflow-y-auto
-            border-b border-l border-gray-800 bg-gray-950/90
+            border-b border-l border-[var(--border-subtle)] bg-[var(--bg-raised)]
             p-6 shadow-2xl backdrop-blur-xl
             sm:w-72
           "
         >
-          <h4 className="mb-6 border-b border-gray-800 pb-2 font-mono text-xs uppercase tracking-widest text-cyan-400">
+          <h4 className="mb-6 border-b border-[var(--border-subtle)] pb-2 font-mono text-xs uppercase tracking-wider text-[var(--text-muted)]">
             {"// Neural Index"}
           </h4>
 
@@ -160,13 +160,13 @@ export default function TableOfContents({
                 className={`
                   block truncate text-sm transition-all duration-200
                   ${activeId === heading.slug
-                    ? "translate-x-1 font-bold text-cyan-400"
-                    : "text-gray-500 hover:translate-x-1 hover:text-gray-300"}
+                    ? "translate-x-1 font-bold text-[var(--accent-dot)]"
+                    : "text-[var(--text-secondary)] hover:translate-x-1 hover:text-[var(--text-primary)]"}
                   ${heading.level === 3 ? "pl-4 text-xs opacity-80" : ""}
                 `}
               >
                 {activeId === heading.slug && (
-                  <span className="mr-2 text-cyan-500" aria-hidden="true">
+                  <span className="mr-2 text-[var(--accent-dot)]" aria-hidden="true">
                     ›
                   </span>
                 )}

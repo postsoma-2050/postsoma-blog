@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import Image from "next/image";
 import { Copy, ChevronRight } from "lucide-react";
 import katex from "katex";
 import TextRenderer from "@/components/TextRenderer";
@@ -46,13 +45,13 @@ export default function BlockRenderer({
 
   if (!blocks?.length) return null;
 
-
   const nodes: React.ReactNode[] = [];
   let i = 0;
 
   while (i < blocks.length) {
     const block = blocks[i];
 
+    // Bulleted Lists
     if (block.type === "bulleted_list_item") {
       const items: NotionBlock[] = [];
       while (i < blocks.length && blocks[i].type === "bulleted_list_item") {
@@ -60,9 +59,12 @@ export default function BlockRenderer({
         i++;
       }
       nodes.push(
-        <ul key={block.id} className="my-4 list-disc pl-6 space-y-2 text-gray-300">
+        <ul
+          key={block.id}
+          className="mb-7 list-disc pl-6 space-y-2.5 text-[1.05rem] leading-[1.8] text-[var(--text-secondary)] font-sans"
+        >
           {items.map((b) => (
-            <li key={b.id}>
+            <li key={b.id} className="pl-1">
               <TextRenderer
                 richText={
                   Array.isArray(b.bulleted_list_item?.rich_text)
@@ -80,6 +82,7 @@ export default function BlockRenderer({
       continue;
     }
 
+    // Numbered Lists
     if (block.type === "numbered_list_item") {
       const items: NotionBlock[] = [];
       while (i < blocks.length && blocks[i].type === "numbered_list_item") {
@@ -87,9 +90,12 @@ export default function BlockRenderer({
         i++;
       }
       nodes.push(
-        <ol key={block.id} className="my-4 list-decimal pl-6 space-y-2 text-gray-300">
+        <ol
+          key={block.id}
+          className="mb-7 list-decimal pl-6 space-y-2.5 text-[1.05rem] leading-[1.8] text-[var(--text-secondary)] font-sans"
+        >
           {items.map((b) => (
-            <li key={b.id}>
+            <li key={b.id} className="pl-1">
               <TextRenderer
                 richText={
                   Array.isArray(b.numbered_list_item?.rich_text)
@@ -111,14 +117,19 @@ export default function BlockRenderer({
     const children = block.children;
 
     switch (block.type) {
+      // Paragraph
       case "paragraph":
         nodes.push(
-          <p key={block.id} className="my-6 leading-8 text-gray-300">
+          <p
+            key={block.id}
+            className="mb-7 text-[1.05rem] leading-[1.8] text-[var(--text-secondary)] font-sans"
+          >
             <TextRenderer richText={rich} />
           </p>
         );
         break;
 
+      // Headings
       case "heading_1":
       case "heading_2":
       case "heading_3": {
@@ -134,29 +145,35 @@ export default function BlockRenderer({
           headingKey === "heading_1"
             ? "text-3xl sm:text-4xl"
             : headingKey === "heading_2"
-              ? "text-2xl"
-              : "text-xl";
+              ? "text-2xl sm:text-[1.75rem]"
+              : "text-xl sm:text-[1.35rem]";
+        const spacingClasses =
+          headingKey === "heading_1"
+            ? "mt-16 mb-5"
+            : headingKey === "heading_2"
+              ? "mt-14 mb-4"
+              : "mt-10 mb-3";
         const isToggleable = !!(data && "is_toggleable" in data && (data as { is_toggleable?: boolean }).is_toggleable);
 
         if (isToggleable) {
           nodes.push(
             <details
               key={block.id}
-              className="group my-4 rounded-lg border-l-2 border-cyan-500/30 pl-4 open:bg-gray-900/20 transition-all duration-300"
+              className={`group ${spacingClasses} rounded-xl border-l-2 border-[var(--border-default)] pl-4 open:bg-[var(--hover-highlight)] transition-all`}
             >
               <summary className="flex cursor-pointer list-none items-center py-2 [&::-webkit-details-marker]:hidden">
-                <span className="mr-3 shrink-0 text-cyan-500 transition-transform group-open:rotate-90" aria-hidden>
+                <span className="mr-3 shrink-0 text-[var(--text-muted)] transition-transform group-open:rotate-90" aria-hidden>
                   ▶
                 </span>
                 <Tag
-                  className={`${fontSize} font-mono font-bold text-white m-0 inline-block`}
+                  className={`${fontSize} font-sans font-semibold tracking-tight text-[var(--text-primary)] m-0 inline-block`}
                   id={slugify(text) || undefined}
                 >
                   <TextRenderer richText={headingRich} />
                 </Tag>
               </summary>
               {Array.isArray(children) && children.length > 0 && (
-                <div className="mt-2 space-y-4 border-l border-gray-800 pl-2 ml-1.5">
+                <div className="mt-2 space-y-4 border-l border-[var(--border-subtle)] pl-2 ml-1.5">
                   <BlockRenderer blocks={children} accent={accent} />
                 </div>
               )}
@@ -167,7 +184,7 @@ export default function BlockRenderer({
             <Tag
               key={block.id}
               id={slugify(text) || undefined}
-              className={`${fontSize} font-mono font-bold text-white mt-10 mb-4 scroll-mt-20 ${headingKey === "heading_3" ? "mt-6 mb-3" : ""}`}
+              className={`${fontSize} ${spacingClasses} font-sans font-semibold tracking-tight text-[var(--text-primary)] scroll-mt-24`}
             >
               <TextRenderer richText={headingRich} />
             </Tag>
@@ -176,24 +193,25 @@ export default function BlockRenderer({
         break;
       }
 
+      // To-do checklist
       case "to_do": {
         const checked = block.to_do?.checked ?? false;
         nodes.push(
-          <div key={block.id} className="my-3 flex items-start gap-3">
+          <div key={block.id} className="my-3.5 flex items-start gap-3">
             <span
-              className="mt-1.5 h-5 w-5 shrink-0 rounded border border-gray-600 bg-gray-800 flex items-center justify-center"
+              className="mt-1 h-5 w-5 shrink-0 rounded-md border-[0.5px] border-[var(--border-default)] bg-[var(--bg-surface)] flex items-center justify-center text-xs"
               aria-hidden
             >
               {checked && (
-                <span className="text-cyan-400" style={{ fontSize: 12 }}>
-                  ✓
-                </span>
+                <span className="text-[var(--accent-dot)] font-bold">✓</span>
               )}
             </span>
             <span
-              className={
-                checked ? "text-gray-500 line-through" : "text-gray-300"
-              }
+              className={`text-[1.02rem] leading-[1.7] ${
+                checked
+                  ? "text-[var(--text-muted)] line-through"
+                  : "text-[var(--text-secondary)]"
+              }`}
             >
               <TextRenderer richText={rich} />
             </span>
@@ -207,22 +225,24 @@ export default function BlockRenderer({
         break;
       }
 
+      // Quote
       case "quote":
         nodes.push(
           <blockquote
             key={block.id}
-            className="border-l-4 border-green-500 py-1 px-4 my-4 italic bg-gray-900/50 text-gray-300"
+            className="my-7 border-l-2 border-[var(--text-muted)] py-2.5 pl-5 italic text-[1.05rem] leading-[1.8] text-[var(--text-secondary)] bg-[var(--hover-highlight)] rounded-r-xl"
           >
             <TextRenderer richText={rich} />
           </blockquote>
         );
         break;
 
+      // Callout
       case "callout":
         nodes.push(
           <div
             key={block.id}
-            className="my-4 rounded-lg border border-gray-700 bg-gray-900/80 p-4"
+            className="my-7 rounded-2xl border-[0.5px] border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 text-[1.02rem] leading-[1.7] text-[var(--text-secondary)] shadow-sm"
           >
             <TextRenderer richText={rich} />
             {Array.isArray(children) && children.length > 0 && (
@@ -234,20 +254,21 @@ export default function BlockRenderer({
         );
         break;
 
+      // Toggle
       case "toggle":
         nodes.push(
           <details
             key={block.id}
-            className="group my-4 rounded border border-gray-700 bg-gray-900/40 overflow-hidden"
+            className="group my-5 rounded-xl border-[0.5px] border-[var(--border-subtle)] bg-[var(--bg-surface)] overflow-hidden"
           >
-            <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 font-mono text-sm text-gray-300 hover:bg-gray-800/60 hover:text-green-400 transition-colors [&::-webkit-details-marker]:hidden">
+            <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 font-mono text-sm text-[var(--text-primary)] hover:bg-[var(--hover-highlight)] transition-colors [&::-webkit-details-marker]:hidden">
               <ChevronRight
-                className="h-4 w-4 shrink-0 transition-transform group-open:rotate-90 text-green-500"
+                className="h-4 w-4 shrink-0 transition-transform group-open:rotate-90 text-[var(--text-muted)]"
                 aria-hidden
               />
               <TextRenderer richText={rich} />
             </summary>
-            <div className="border-t border-gray-800 px-4 py-3 pl-8">
+            <div className="border-t border-[var(--border-subtle)] px-4 py-3 pl-8">
               {Array.isArray(children) && children.length > 0 ? (
                 <BlockRenderer blocks={children} accent={accent} />
               ) : null}
@@ -256,6 +277,7 @@ export default function BlockRenderer({
         );
         break;
 
+      // Code Block
       case "code": {
         const codeContent = block.code;
         const codeText = Array.isArray(codeContent?.rich_text)
@@ -265,36 +287,39 @@ export default function BlockRenderer({
           : "";
         const lang = codeContent?.language ?? "plaintext";
         nodes.push(
-          <div key={block.id} className="my-6 rounded-lg overflow-hidden border border-gray-700 bg-gray-900">
-            <div className="flex items-center justify-between border-b border-gray-700 bg-gray-800/80 px-3 py-2">
-              <span className="font-mono text-xs text-gray-500 uppercase tracking-wider">
+          <div key={block.id} className="my-7 rounded-xl overflow-hidden border-[0.5px] border-[var(--border-subtle)] bg-[var(--bg-raised)] shadow-sm">
+            <div className="flex items-center justify-between border-b border-[var(--border-subtle)] bg-[var(--bg-surface)] px-4 py-2">
+              <span className="font-mono text-xs text-[var(--text-muted)] uppercase tracking-wider">
                 {lang}
               </span>
               <button
                 type="button"
                 onClick={() => copyCode(block.id, codeText)}
-                className="flex items-center gap-1.5 rounded px-2 py-1 font-mono text-xs text-gray-400 hover:text-cyan-400 hover:bg-gray-700/50 transition-colors"
+                className="flex items-center gap-1.5 rounded px-2.5 py-1 font-mono text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--hover-highlight)] transition-colors"
               >
                 <Copy className="h-3.5 w-3.5" />
                 {copiedId === block.id ? "Copied" : "Copy"}
               </button>
             </div>
-            <pre className="p-4 overflow-x-auto text-sm">
-              <code className="font-mono text-pink-400/95 bg-transparent">
-                {codeText}
-              </code>
+            <pre className="p-4 overflow-x-auto text-sm leading-relaxed font-mono text-[var(--text-primary)] bg-transparent">
+              <code>{codeText}</code>
             </pre>
           </div>
         );
         break;
       }
 
+      // Divider
       case "divider":
         nodes.push(
-          <hr key={block.id} className="my-6 border-gray-700" />
+          <hr
+            key={block.id}
+            className="my-10 border-0 border-t-[0.5px] border-[var(--border-subtle)]"
+          />
         );
         break;
 
+      // Equation
       case "equation": {
         const expression = block.equation?.expression ?? "";
         let html = "";
@@ -309,13 +334,14 @@ export default function BlockRenderer({
         nodes.push(
           <div
             key={block.id}
-            className="my-6 overflow-x-auto text-center py-2 text-white"
+            className="my-7 overflow-x-auto text-center py-2 text-[var(--text-primary)]"
             dangerouslySetInnerHTML={{ __html: html }}
           />
         );
         break;
       }
 
+      // Table
       case "table": {
         const tableData = (block as { table?: { has_column_header?: boolean } }).table;
         const rows = block.children ?? [];
@@ -323,9 +349,9 @@ export default function BlockRenderer({
         nodes.push(
           <div
             key={block.id}
-            className="my-8 w-full overflow-x-auto rounded-lg border border-gray-800 bg-[#0a0a0a] shadow-[0_0_10px_rgba(0,0,0,0.3)]"
+            className="my-8 w-full overflow-x-auto rounded-xl border-[0.5px] border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-sm"
           >
-            <table className="w-full border-collapse text-sm">
+            <table className="w-full border-collapse font-sans text-sm">
               <tbody>
                 {rows.map((rowBlock, rowIndex) => {
                   if (rowBlock.type !== "table_row") return null;
@@ -336,15 +362,17 @@ export default function BlockRenderer({
                   return (
                     <tr
                       key={rowBlock.id}
-                      className={
-                        isHeaderRow ? "bg-gray-900/80" : "hover:bg-gray-800/30 transition-colors"
-                      }
+                      className={`border-b border-[var(--border-subtle)] last:border-b-0 ${
+                        isHeaderRow
+                          ? "bg-[var(--bg-raised)] font-semibold text-[var(--text-primary)]"
+                          : "hover:bg-[var(--hover-highlight)] transition-colors text-[var(--text-secondary)]"
+                      }`}
                     >
                       {cells.map((cell, cellIndex) => {
                         const CellTag = isHeaderRow ? "th" : "td";
                         const cellClasses = isHeaderRow
-                          ? "border-b border-gray-700 px-4 py-3 text-left font-mono font-bold text-cyan-400 tracking-wide whitespace-nowrap"
-                          : "min-w-[120px] border-b border-gray-800 px-4 py-3 text-gray-300";
+                          ? "px-4 py-3 text-left font-semibold text-[var(--text-primary)] whitespace-nowrap"
+                          : "min-w-[120px] px-4 py-3 text-[var(--text-secondary)]";
 
                         return (
                           <CellTag key={`${rowBlock.id}-${cellIndex}`} className={cellClasses}>
@@ -362,11 +390,7 @@ export default function BlockRenderer({
         break;
       }
 
-      case "child_page":
-      case "child_database":
-      case "unsupported":
-        break;
-
+      // Image
       case "image": {
         const img = block.image;
         const rawUrl =
@@ -404,11 +428,7 @@ export default function BlockRenderer({
                 src={url}
                 alt={alt}
                 loading="lazy"
-                className="mx-auto rounded-lg shadow-lg max-w-full h-auto"
-                style={{
-                  border: "1px solid var(--border-subtle)",
-                  boxShadow: "0 0 20px 2px rgba(0, 240, 255, 0.1)",
-                }}
+                className="mx-auto rounded-xl border-[0.5px] border-[var(--border-subtle)] shadow-sm max-w-full h-auto"
               />
             </div>
           );
@@ -419,7 +439,7 @@ export default function BlockRenderer({
       default:
         if (rich.length > 0) {
           nodes.push(
-            <p key={block.id} className="my-6 text-gray-300">
+            <p key={block.id} className="mb-7 text-[1.05rem] leading-[1.8] text-[var(--text-secondary)] font-sans">
               <TextRenderer richText={rich} />
             </p>
           );

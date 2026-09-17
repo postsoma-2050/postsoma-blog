@@ -3,19 +3,84 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --bg: #121212;
-  --text-primary: #E0E0E0;
-  --text-secondary: #A0A0A0;
+/* ── Global Design Tokens (Paul Stamatiou 90-8-2 OKLCH Architecture) ─────── */
+[data-theme="dark"], :root {
+  /* 90% 暖调底色：微橄榄暖黑，彻底告别死黑 */
+  --bg-base: oklch(18.5% 0.1 120);              /* #0E1A0A */
+  --bg-surface: rgba(20, 27, 4, 0.55);          /* 极深森林暖黑半透明 */
+  --bg-raised: rgba(28, 38, 7, 0.7);
+  --summary-bg: rgba(20, 27, 4, 0.55);
+  --summary-border: rgba(255, 255, 255, 0.1);
+
+  /* 文字分级：温润柔和，非刺眼冷白 */
+  --text-primary: oklch(98% 0.0125 138);        /* 暖白 */
+  --text-secondary: oklch(70% 0.05 125);        /* 优雅暖灰 */
+  --text-muted: oklch(52% 0.025 125);           /* 暗调灰 */
+
+  /* 0.5px 极细微边框：严禁使用 1px 荧光实线与刺眼白边 */
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-default: rgba(255, 255, 255, 0.14);
+  --hover-highlight: rgba(255, 255, 255, 0.04);
+  --card-inset: none;
+  --dock-bg: oklch(22% 0.04 120 / 0.65);
+
+  /* 1% Accent：仅保留作为极微小微光点 */
+  --accent-dot: #00FF41;
+
+  /* Category accents */
   --accent-ai: #00F0FF;
-  --accent-blockchain: #F7931A;
   --accent-philosophy: #00FF41;
+  --accent-blockchain: #F7931A;
   --accent-investing-bull: #00FF41;
   --accent-investing-bear: #FF3B30;
-  --accent-notes: #F5F5F5;
-  --border-subtle: rgba(224, 224, 224, 0.12);
+  --accent-notes: #A3A3A3;
 }
 
+[data-theme="light"] {
+  --bg-base: #F7F2ED;                           /* 纯净纸质暖白底色 */
+  --bg-surface: rgba(255, 255, 255, 0.45);      /* 极微弱半透明微白，与画布自然过渡 */
+  --bg-raised: rgba(255, 255, 255, 0.75);       /* 悬浮/抬升态微白 */
+  --summary-bg: rgba(255, 255, 255, 0.40);
+  --summary-border: rgba(0, 0, 0, 0.05);
+  --text-primary: oklch(25% 0.01 60);           /* 深暖黑 #1C1917 - 标题锐利深邃 */
+  --text-secondary: oklch(35% 0.01 67);         /* 深暖棕炭色 #383531 - 正文清晰护眼 */
+  --text-muted: oklch(58% 0.015 60);            /* 中性暖灰 - 日期与元数据 */
+  --border-subtle: rgba(0, 0, 0, 0.05);         /* 0.5px 极细微边框 border-black/[0.05] */
+  --border-default: rgba(0, 0, 0, 0.10);
+  --hover-highlight: rgba(0, 0, 0, 0.025);
+  --card-inset: none;                           /* 彻底拔除白色内阴影，拒绝贴纸拼贴感 */
+  --dock-bg: oklch(90% 0.03 80 / 0.4);          /* 与米色背景同源的半透明浮动胶囊底色 */
+  --accent-dot: oklch(45% 0.12 125);
+
+  --accent-ai: #0077B6;
+  --accent-philosophy: oklch(45% 0.12 125);
+  --accent-blockchain: #C2410C;
+  --accent-investing-bull: oklch(45% 0.12 125);
+  --accent-investing-bear: #DC2626;
+  --accent-notes: #78716C;
+}
+
+/* ── Typography & Prose CSS Variable Mapping ─────────────────────────────── */
+.prose {
+  --tw-prose-body: var(--text-secondary);
+  --tw-prose-headings: var(--text-primary);
+  --tw-prose-lead: var(--text-secondary);
+  --tw-prose-links: var(--text-primary);
+  --tw-prose-bold: var(--text-primary);
+  --tw-prose-counters: var(--text-muted);
+  --tw-prose-bullets: var(--text-muted);
+  --tw-prose-hr: var(--border-subtle);
+  --tw-prose-quotes: var(--text-primary);
+  --tw-prose-quote-borders: var(--border-default);
+  --tw-prose-captions: var(--text-muted);
+  --tw-prose-code: var(--text-primary);
+  --tw-prose-pre-code: var(--text-primary);
+  --tw-prose-pre-bg: var(--bg-surface);
+  --tw-prose-th-borders: var(--border-subtle);
+  --tw-prose-td-borders: var(--border-subtle);
+}
+
+/* ── Reset ───────────────────────────────────────────────────────────────── */
 * {
   box-sizing: border-box;
   padding: 0;
@@ -24,199 +89,137 @@
 
 html {
   scroll-behavior: smooth;
+  background-color: var(--bg-base);
+  overflow-x: clip;
 }
 
 body {
-  background-color: var(--bg);
+  background-color: var(--bg-base);
   color: var(--text-primary);
   font-family: var(--font-inter), Inter, system-ui, sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
 }
 
-/* Diagonal grid background layer - animates toward center, separate from content */
+/* ── Scrollbar utilities ─────────────────────────────────────────────────── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+
+.subcat-scroll::-webkit-scrollbar { height: 3px; }
+.subcat-scroll::-webkit-scrollbar-track { background: transparent; }
+.subcat-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+}
+.subcat-scroll { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent; }
+
+/* ── Subtle Background ───────────────────────────────────────────────────── */
 body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  /* Diagonal grid lines - sparser for cleaner look */
-  background-image:
-    repeating-linear-gradient(45deg,
-      rgba(224, 224, 224, 0.08) 0px,
-      rgba(224, 224, 224, 0.08) 1px,
-      transparent 1px,
-      transparent 56px),
-    repeating-linear-gradient(-45deg,
-      rgba(224, 224, 224, 0.08) 0px,
-      rgba(224, 224, 224, 0.08) 1px,
-      transparent 1px,
-      transparent 56px);
-  background-size: 56px 56px;
-  animation: gridFlow 3s linear infinite;
-}
-
-@keyframes gridFlow {
-  0% {
-    background-position: 0 0, 0 0;
-  }
-
-  100% {
-    background-position: 56px 56px, -56px 56px;
-  }
-}
-
-/* Hide grid on reading/article pages */
-body[data-reading="true"]::before {
   display: none;
 }
 
-/* Glitch text effect (for logo / headings) */
-.glitch-layers {
-  position: relative;
-  display: inline-block;
-}
-
+/* ── Glitch text effect ──────────────────────────────────────────────────── */
+.glitch-layers { position: relative; display: inline-block; }
 .glitch-layers::before,
 .glitch-layers::after {
   content: attr(data-text);
   position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
 }
-
 .glitch-layers::before {
-  color: var(--accent-ai);
+  color: #00F0FF;
   animation: glitch-before 0.4s ease-in-out infinite;
   clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
   transform: translate(-2px, 0);
 }
-
 .glitch-layers::after {
-  color: var(--accent-philosophy);
+  color: #00FF41;
   animation: glitch-after 0.4s ease-in-out infinite;
   clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
   transform: translate(2px, 0);
 }
-
 @keyframes glitch-before {
-  0% {
-    transform: translate(-2px, 0);
-  }
-
-  33% {
-    transform: translate(2px, -1px);
-  }
-
-  66% {
-    transform: translate(-1px, 1px);
-  }
-
-  100% {
-    transform: translate(-2px, 0);
-  }
+  0%   { transform: translate(-2px, 0); }
+  33%  { transform: translate(2px, -1px); }
+  66%  { transform: translate(-1px, 1px); }
+  100% { transform: translate(-2px, 0); }
 }
-
 @keyframes glitch-after {
-  0% {
-    transform: translate(2px, 0);
-  }
-
-  33% {
-    transform: translate(-2px, 1px);
-  }
-
-  66% {
-    transform: translate(1px, -1px);
-  }
-
-  100% {
-    transform: translate(2px, 0);
-  }
+  0%   { transform: translate(2px, 0); }
+  33%  { transform: translate(-2px, 1px); }
+  66%  { transform: translate(1px, -1px); }
+  100% { transform: translate(2px, 0); }
 }
 
+/* ── Laser stream ────────────────────────────────────────────────────────── */
 @keyframes laser-stream {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
-
 .animate-laser-stream {
   animation: laser-stream 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-/* Hero: hollow / stroke title (ghost watermark) */
+/* ── Hero stroke title ───────────────────────────────────────────────────── */
 .hero-title-stroke {
   color: transparent;
   -webkit-text-stroke: 1px rgba(0, 240, 255, 0.5);
   paint-order: stroke fill;
 }
 
-/* Bento: glitch hover on AI Insights cell */
-.bento-glitch:hover {
-  animation: glitch 0.4s ease-in-out;
-}
-
+/* ── Bento glitch hover ──────────────────────────────────────────────────── */
+.bento-glitch:hover { animation: glitch 0.4s ease-in-out; }
 .bento-glitch:hover * {
-  text-shadow: 1px 0 var(--accent-ai), -1px 0 var(--accent-philosophy);
+  text-shadow: 1px 0 #00F0FF, -1px 0 #00FF41;
+}
+@keyframes glitch {
+  0%   { transform: translate(0); }
+  20%  { transform: translate(-2px, 2px); }
+  40%  { transform: translate(2px, -2px); }
+  60%  { transform: translate(-2px, -2px); }
+  80%  { transform: translate(2px, 2px); }
+  100% { transform: translate(0); }
 }
 
-/* Scanline texture for archive / memory bank cards */
+/* ── Scanline ────────────────────────────────────────────────────────────── */
 .sheshin-scanline {
   background-image: repeating-linear-gradient(0deg,
-      transparent,
-      transparent 2px,
-      rgba(0, 0, 0, 0.06) 2px,
-      rgba(0, 0, 0, 0.06) 4px);
+    transparent, transparent 2px,
+    rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px);
 }
 
-/* Focus ring for accessibility */
+/* ── Focus ring ──────────────────────────────────────────────────────────── */
 *:focus-visible {
-  outline: 2px solid var(--accent-ai);
+  outline: 2px solid #00F0FF;
   outline-offset: 2px;
 }
 
-/* Subtle scrollbar for subcategory nav */
-.subcat-scroll::-webkit-scrollbar {
-  height: 3px;
-}
-.subcat-scroll::-webkit-scrollbar-track {
-  background: transparent;
-}
-.subcat-scroll::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.35);
-  border-radius: 999px;
-}
-.subcat-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.5);
-}
-.subcat-scroll {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
-}
-
-/* ── HUD status bar ticker (mobile) ─────────────────────────────────────── */
+/* ── HUD ticker ──────────────────────────────────────────────────────────── */
 @keyframes hudScroll {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
-
-
 @media (max-width: 767px) {
   .hud-ticker {
-    /* Enable overflow scroll on touch instead of animation for better UX */
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
   }
-  .hud-ticker::-webkit-scrollbar {
-    display: none;
-  }
+  .hud-ticker::-webkit-scrollbar { display: none; }
+}
+
+/* ── View Transitions (Theme Circular Spread Animation) ──────────────────── */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+[data-theme="dark"]::view-transition-new(root) {
+  z-index: 9999;
+}
+[data-theme="light"]::view-transition-old(root) {
+  z-index: 9999;
 }

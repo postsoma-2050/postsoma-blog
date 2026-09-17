@@ -9,17 +9,24 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // PostSoma-2050 Design System (Dark Mode Only)
-        bg: "#121212",
-        "text-primary": "#E0E0E0",
-        "text-secondary": "#A0A0A0",
+        // PostSoma-2050 Design System (OKLCH Warm Dark / Light)
+        bg: "var(--bg-base)",
+        "bg-surface": "var(--bg-surface)",
+        "bg-raised": "var(--bg-raised)",
+        "text-primary": "var(--text-primary)",
+        "text-secondary": "var(--text-secondary)",
+        "text-muted": "var(--text-muted)",
+        "border-subtle": "var(--border-subtle)",
+        "border-default": "var(--border-default)",
+        "hover-highlight": "var(--hover-highlight)",
+        "accent-dot": "var(--accent-dot)",
         // Category accents (borders, glows, active states)
-        "accent-ai": "#00F0FF", // Neon Cyan - AI Insights
-        "accent-blockchain": "#F7931A", // Bitcoin Orange
-        "accent-philosophy": "#00FF41", // Terminal / Matrix Green
-        "accent-investing-bull": "#00FF41", // Green
-        "accent-investing-bear": "#FF3B30", // Red
-        "accent-notes": "#F5F5F5", // Paper White - Sheshin Notes
+        "accent-ai": "var(--accent-ai)",
+        "accent-blockchain": "var(--accent-blockchain)",
+        "accent-philosophy": "var(--accent-philosophy)",
+        "accent-investing-bull": "var(--accent-investing-bull)",
+        "accent-investing-bear": "var(--accent-investing-bear)",
+        "accent-notes": "var(--accent-notes)",
       },
       fontFamily: {
         mono: ["var(--font-jetbrains-mono)", "JetBrains Mono", "Space Mono", "monospace"],

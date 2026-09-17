@@ -4,16 +4,16 @@ import katex from "katex";
 import type { NotionRichText } from "@/lib/notion";
 
 const NOTION_COLOR_TO_CLASS: Record<string, string> = {
-  default: "text-[#E0E0E0]",
-  gray: "text-gray-400",
-  brown: "text-amber-200",
-  orange: "text-orange-400",
-  yellow: "text-yellow-400",
-  green: "text-green-400",
-  blue: "text-cyan-400",
-  purple: "text-purple-400",
-  pink: "text-pink-400",
-  red: "text-red-400",
+  default: "",
+  gray: "text-stone-500 dark:text-stone-400",
+  brown: "text-amber-800 dark:text-amber-200",
+  orange: "text-orange-700 dark:text-orange-300",
+  yellow: "text-amber-900 dark:text-yellow-200 font-medium",
+  green: "text-emerald-800 dark:text-emerald-300",
+  blue: "text-sky-800 dark:text-cyan-300",
+  purple: "text-purple-800 dark:text-purple-300",
+  pink: "text-rose-800 dark:text-pink-300",
+  red: "text-red-700 dark:text-red-400",
 };
 
 type TextRendererProps = {
@@ -86,11 +86,6 @@ function renderContentWithMath(content: string, isEquation: boolean): React.Reac
   return content;
 }
 
-/**
- * Renders Notion rich_text array with Cyberpunk theme:
- * Bold = white, Code = pink + dark bg, Underline = border (no <u>), Links = cyan + hover glow.
- * Math equations = KaTeX rendered HTML.
- */
 export default function TextRenderer({ richText }: TextRendererProps) {
   if (!Array.isArray(richText) || richText.length === 0) return null;
 
@@ -132,7 +127,7 @@ export default function TextRenderer({ richText }: TextRendererProps) {
               href={link}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-cyan-400 no-underline hover:text-cyan-300 hover:shadow-[0_0_8px_rgba(34,211,238,0.5)] transition-all"
+              className="text-[var(--accent-ai)] underline decoration-[var(--accent-ai)]/40 underline-offset-4 hover:decoration-[var(--accent-ai)] transition-colors"
             >
               {node}
             </a>
@@ -140,23 +135,23 @@ export default function TextRenderer({ richText }: TextRendererProps) {
         }
         if (ann.code) {
           node = (
-            <code className="rounded bg-gray-800 px-1 font-mono text-pink-400">
+            <code className="rounded bg-[var(--hover-highlight)] px-1.5 py-0.5 font-mono text-[0.88em] text-[var(--text-primary)] border border-[var(--border-subtle)]">
               {node}
             </code>
           );
         }
         if (ann.bold) {
-          node = <strong className="font-bold text-white">{node}</strong>;
+          node = <strong className="font-semibold text-[var(--text-primary)]">{node}</strong>;
         }
         if (ann.italic) {
-          node = <em className="text-gray-400">{node}</em>;
+          node = <em className="italic opacity-90">{node}</em>;
         }
         if (ann.strikethrough) {
-          node = <s>{node}</s>;
+          node = <s className="opacity-70">{node}</s>;
         }
         if (ann.underline || hadLiteralUnderline) {
           node = (
-            <span className="border-b-2 border-cyan-500 decoration-transparent">
+            <span className="underline underline-offset-4 decoration-[var(--border-default)]">
               {node}
             </span>
           );
