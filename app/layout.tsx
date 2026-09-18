@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { JetBrains_Mono, Inter } from "next/font/google";
 import Script from "next/script";
@@ -9,6 +10,7 @@ import FloatingDock from "@/components/FloatingDock";
 import SearchModal, { type SearchablePost } from "@/components/SearchModal";
 import BodyRouteClass from "@/components/BodyRouteClass";
 import Footer from "@/components/Footer";
+import CyberTopLoader from "@/components/CyberTopLoader";
 import { getPublishedPosts, getArticleCountByCategory } from "@/lib/notion";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -144,6 +146,9 @@ export default async function RootLayout({
       <body
         className={`${jetbrainsMono.variable} ${inter.variable} min-h-screen bg-bg font-sans text-text-primary antialiased`}
       >
+        <Suspense fallback={null}>
+          <CyberTopLoader />
+        </Suspense>
         <BodyRouteClass />
         <SearchModal posts={searchablePosts} />
         <Navbar />
