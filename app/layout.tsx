@@ -122,8 +122,14 @@ export default async function RootLayout({
   }));
 
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning>
       <head>
+        <script
+          id="theme-initializer"
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var s=localStorage.getItem('theme');var t=s==='light'||s==='dark'?s:'dark';document.documentElement.setAttribute('data-theme',t);if(t==='dark'){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}document.documentElement.style.colorScheme=t}catch(e){}})();`,
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
