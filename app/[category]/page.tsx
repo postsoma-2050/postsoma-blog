@@ -43,12 +43,22 @@ export async function generateMetadata({
       description,
       url: canonicalUrl,
       siteName: "PostSoma 2050",
-      images: [{ url: `${SITE_URL}/no-future.jpg`, width: 1200, height: 630 }],
+      images: [
+        {
+          url: `${SITE_URL}/api/og?title=${encodeURIComponent(category)}&category=${encodeURIComponent(category)}`,
+          width: 1200,
+          height: 630,
+          alt: `${category} | PostSoma 2050`,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: `${category} | PostSoma 2050`,
       description,
+      images: [
+        `${SITE_URL}/api/og?title=${encodeURIComponent(category)}&category=${encodeURIComponent(category)}`,
+      ],
     },
   };
 }

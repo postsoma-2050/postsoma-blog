@@ -9,11 +9,22 @@ export function getArticleOgImage(post: Post): string {
     (firstImage.url.includes("amazonaws.com") ||
       firstImage.url.includes("notion.so") ||
       firstImage.url.includes("X-Amz-Expires"));
-  return firstImage
+
+  const rawImageUrl = firstImage
     ? isFirstImageNotion && post.id
       ? `${SITE_URL}/api/image?pageId=${post.id}&mediaIndex=0`
       : firstImage.url
-    : `${SITE_URL}/no-future.jpg`;
+    : null;
+
+  const titleParam = encodeURIComponent(post.name);
+  const catParam = encodeURIComponent(post.category);
+  const readTimeParam = encodeURIComponent((post as { readTime?: string }).readTime ?? "5 min read");
+
+  if (rawImageUrl) {
+    return `${SITE_URL}/api/og?title=${titleParam}&category=${catParam}&readTime=${readTimeParam}&cover=${encodeURIComponent(rawImageUrl)}`;
+  }
+
+  return `${SITE_URL}/api/og?title=${titleParam}&category=${catParam}&readTime=${readTimeParam}`;
 }
 
 export function buildArticleJsonLd(

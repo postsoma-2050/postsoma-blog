@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     url: "https://www.postsoma-2050.com",
     images: [
       {
-        url: "/no-future.jpg",
+        url: "https://www.postsoma-2050.com/og-image.png",
         width: 1200,
         height: 630,
         alt: "PostSoma 2050",
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "PostSoma 2050 | Cyberpunk-Humanist Knowledge Garden",
     description: "High-Tech meets High-Touch. AI, Blockchain, Philosophy, Investing, Notes.",
-    images: ["/no-future.jpg"],
+    images: ["https://www.postsoma-2050.com/og-image.png"],
   },
   alternates: {
     canonical: "https://www.postsoma-2050.com",
