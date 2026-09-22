@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { Post } from "@/lib/types";
@@ -19,6 +19,44 @@ interface CuratedPostListProps {
 function formatDate(iso: string | null): string {
   if (!iso) return "2024.01.01";
   return iso.split("T")[0].replace(/-/g, ".");
+}
+
+// ── Hourly deterministic shuffle ──────────────────────────────────────────
+// Seed = year·1e6 + month·1e4 + day·1e2 + hour  (changes every clock hour)
+function getHourSeed(): number {
+  const d = new Date();
+  return (
+    d.getFullYear() * 1_000_000 +
+    (d.getMonth() + 1) * 10_000 +
+    d.getDate() * 100 +
+    d.getHours()
+  );
+}
+
+// mulberry32 — fast, good-quality 32-bit seeded PRNG
+function mulberry32(seed: number) {
+  return function () {
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4_294_967_296;
+  };
+}
+
+function seededShuffle<T>(arr: T[], seed: number): T[] {
+  const rng = mulberry32(seed);
+  const result = [...arr];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+/** Minutes remaining until the next full clock-hour */
+function minutesUntilNextHour(): number {
+  const now = new Date();
+  return 59 - now.getMinutes();
 }
 
 function estimateReadingTime(post: Post): string {
@@ -52,12 +90,36 @@ export default function CuratedPostList({
   initialPosts,
   totalCount = posts.length,
 }: CuratedPostListProps) {
-  // State for the currently displayed 6 posts from the random pool
+  // Deterministic hourly seed — same seed within the same clock-hour
   const [displayPosts, setDisplayPosts] = useState<Post[]>(() => {
-    if (initialPosts && initialPosts.length > 0) return initialPosts.slice(0, 6);
-    return posts.slice(0, 6);
+    const pool = initialPosts && initialPosts.length > 0 ? initialPosts : posts;
+    return seededShuffle(pool, getHourSeed()).slice(0, 6);
   });
   const [isShuffling, setIsShuffling] = useState(false);
+  const [minsLeft, setMinsLeft] = useState<number>(minutesUntilNextHour);
+
+  // Auto-reshuffle every clock-hour + keep countdown ticking
+  useEffect(() => {
+    const tick = () => {
+      const newSeed = getHourSeed();
+      // Only reshuffle when the hour actually flips
+      setDisplayPosts((prev) => {
+        const prevSeed =
+          prev.length > 0
+            ? seededShuffle(posts, newSeed).slice(0, 6).map((p) => p.slug).join("|")
+            : "";
+        const currSlugs = prev.map((p) => p.slug).join("|");
+        if (prevSeed !== currSlugs) {
+          return seededShuffle(posts, newSeed).slice(0, 6);
+        }
+        return prev;
+      });
+      setMinsLeft(minutesUntilNextHour());
+    };
+    // Check every 60 s — lightweight; only triggers a state change on the hour boundary
+    const id = setInterval(tick, 60_000);
+    return () => clearInterval(id);
+  }, [posts]);
 
   const handleShuffle = () => {
     if (posts.length <= 6) {
@@ -67,12 +129,12 @@ export default function CuratedPostList({
 
     setIsShuffling(true);
 
-    // Pick 6 fresh items from candidate pool, prioritizing nodes not currently displayed
+    // Prefer nodes not currently shown
     const currentSlugs = new Set(displayPosts.map((p) => p.slug));
     const unshown = posts.filter((p) => !currentSlugs.has(p.slug));
     const candidatePool = unshown.length >= 6 ? unshown : posts;
 
-    // Fisher-Yates shuffle
+    // Fisher-Yates with Math.random for manual shuffle (intentionally non-deterministic)
     const shuffled = [...candidatePool];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -80,10 +142,7 @@ export default function CuratedPostList({
     }
 
     setDisplayPosts(shuffled.slice(0, 6));
-
-    setTimeout(() => {
-      setIsShuffling(false);
-    }, 350);
+    setTimeout(() => setIsShuffling(false), 350);
   };
 
   return (
@@ -98,6 +157,13 @@ export default function CuratedPostList({
           </span>
           <span className="opacity-40">/</span>
           <span>6 OF {totalCount} NODES</span>
+          <span className="opacity-30 select-none">·</span>
+          <span
+            className="opacity-50 tabular-nums"
+            title="Auto-refreshes every clock hour"
+          >
+            SYNC IN {minsLeft}M
+          </span>
         </div>
 
         {/* 右侧一键洗牌按钮 */}
