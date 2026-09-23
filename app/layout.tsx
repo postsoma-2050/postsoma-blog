@@ -51,12 +51,15 @@ export const metadata: Metadata = {
     title: "PostSoma 2050 | Cyberpunk-Humanist Knowledge Garden",
     description: "High-Tech meets High-Touch. AI, Blockchain, Philosophy, Investing, Notes.",
     url: "https://www.postsoma-2050.com",
+    locale: "zh_TW",
     images: [
       {
         url: "https://www.postsoma-2050.com/og-image.png",
+        secureUrl: "https://www.postsoma-2050.com/og-image.png",
         width: 1200,
         height: 630,
-        alt: "PostSoma 2050",
+        type: "image/png",
+        alt: "PostSoma 2050 — Cyberpunk-Humanist Knowledge Garden",
       },
     ],
   },

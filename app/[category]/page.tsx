@@ -28,27 +28,71 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { category: categorySlug } = await params;
   const category = getCategoryBySlug(categorySlug);
-  if (!category) return {};
+  const globalFallbackUrl = `${SITE_URL}/og-image.png`;
+
+  if (!category) {
+    return {
+      title: "Archive Category | PostSoma 2050",
+      description: "Explore curated knowledge domains on PostSoma 2050.",
+      alternates: { canonical: `${SITE_URL}/${categorySlug}` },
+      openGraph: {
+        type: "website",
+        title: "Archive Category | PostSoma 2050",
+        description: "Explore curated knowledge domains on PostSoma 2050.",
+        url: `${SITE_URL}/${categorySlug}`,
+        siteName: "PostSoma 2050",
+        locale: "zh_TW",
+        images: [
+          {
+            url: globalFallbackUrl,
+            secureUrl: globalFallbackUrl,
+            width: 1200,
+            height: 630,
+            type: "image/png",
+            alt: "PostSoma 2050",
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: "Archive Category | PostSoma 2050",
+        description: "Explore curated knowledge domains on PostSoma 2050.",
+        images: [globalFallbackUrl],
+      },
+    };
+  }
 
   const description = CATEGORY_DESCRIPTIONS[category];
   const canonicalUrl = `${SITE_URL}/${categorySlug}`;
+  const categoryOgUrl = `${SITE_URL}/api/og?title=${encodeURIComponent(category)}&category=${encodeURIComponent(category)}`;
 
   return {
-    title: category,
+    title: `${category} | PostSoma 2050`,
     description,
     alternates: { canonical: canonicalUrl },
     openGraph: {
       type: "website",
+      siteName: "PostSoma 2050",
       title: `${category} | PostSoma 2050`,
       description,
       url: canonicalUrl,
-      siteName: "PostSoma 2050",
+      locale: "zh_TW",
       images: [
         {
-          url: `${SITE_URL}/api/og?title=${encodeURIComponent(category)}&category=${encodeURIComponent(category)}`,
+          url: categoryOgUrl,
+          secureUrl: categoryOgUrl,
           width: 1200,
           height: 630,
+          type: "image/png",
           alt: `${category} | PostSoma 2050`,
+        },
+        {
+          url: globalFallbackUrl,
+          secureUrl: globalFallbackUrl,
+          width: 1200,
+          height: 630,
+          type: "image/png",
+          alt: "PostSoma 2050",
         },
       ],
     },
@@ -56,9 +100,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: `${category} | PostSoma 2050`,
       description,
-      images: [
-        `${SITE_URL}/api/og?title=${encodeURIComponent(category)}&category=${encodeURIComponent(category)}`,
-      ],
+      images: [categoryOgUrl, globalFallbackUrl],
     },
   };
 }

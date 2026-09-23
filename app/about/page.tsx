@@ -21,11 +21,30 @@ export const metadata: Metadata = {
     canonical: `${SITE_URL}/about`,
   },
   openGraph: {
+    type: "website",
+    siteName: "PostSoma 2050",
     title: "About & E-E-A-T | PostSoma 2050",
     description:
       "Learn about PostSoma 2050, founded by postsoma-2050. Discover our editorial ethics, E-E-A-T credentials, AI knowledge feeds, and citation guidelines.",
     url: `${SITE_URL}/about`,
-    siteName: "PostSoma 2050",
+    locale: "zh_TW",
+    images: [
+      {
+        url: `${SITE_URL}/og-image.png`,
+        secureUrl: `${SITE_URL}/og-image.png`,
+        width: 1200,
+        height: 630,
+        type: "image/png",
+        alt: "About PostSoma 2050 — E-E-A-T & Editorial Ethics",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About & E-E-A-T | PostSoma 2050",
+    description:
+      "Learn about PostSoma 2050, founded by postsoma-2050. Discover our editorial ethics, E-E-A-T credentials, AI knowledge feeds, and citation guidelines.",
+    images: [`${SITE_URL}/og-image.png`],
   },
 };
 

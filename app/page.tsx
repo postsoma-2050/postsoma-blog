@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import HeroSearch from "@/components/HeroSearch";
 import HorizontalRail from "@/components/HorizontalRail";
 import CuratedPostList from "@/components/CuratedPostList";
@@ -5,6 +6,41 @@ import PortalCell from "@/components/bento/PortalCell";
 import { getPublishedPosts } from "@/lib/notion";
 
 export const revalidate = 604800; // 7 days fallback, rely primarily on On-Demand ISR Webhook
+
+export const metadata: Metadata = {
+  title: "PostSoma 2050 | Cyberpunk-Humanist Knowledge Garden",
+  description:
+    "High-Tech meets High-Touch. AI, Blockchain, Philosophy, Investing, Notes.",
+  alternates: {
+    canonical: "https://www.postsoma-2050.com",
+  },
+  openGraph: {
+    type: "website",
+    siteName: "PostSoma 2050",
+    title: "PostSoma 2050 | Cyberpunk-Humanist Knowledge Garden",
+    description:
+      "High-Tech meets High-Touch. AI, Blockchain, Philosophy, Investing, Notes.",
+    url: "https://www.postsoma-2050.com",
+    locale: "zh_TW",
+    images: [
+      {
+        url: "https://www.postsoma-2050.com/og-image.png",
+        secureUrl: "https://www.postsoma-2050.com/og-image.png",
+        width: 1200,
+        height: 630,
+        type: "image/png",
+        alt: "PostSoma 2050 — Cyberpunk-Humanist Knowledge Garden",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PostSoma 2050 | Cyberpunk-Humanist Knowledge Garden",
+    description:
+      "High-Tech meets High-Touch. AI, Blockchain, Philosophy, Investing, Notes.",
+    images: ["https://www.postsoma-2050.com/og-image.png"],
+  },
+};
 
 const homeJsonLd = {
   "@context": "https://schema.org",

@@ -38,7 +38,39 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPostBySlug(slug);
-  if (!post) return {};
+  const fallbackOgImage = `${SITE_URL}/og-image.png`;
+
+  if (!post) {
+    return {
+      title: "Transmission Not Found | PostSoma 2050",
+      description: "The requested knowledge transmission does not exist or has been relocated.",
+      alternates: { canonical: `${SITE_URL}/post/${slug}` },
+      openGraph: {
+        type: "article",
+        siteName: "PostSoma 2050",
+        title: "Transmission Not Found | PostSoma 2050",
+        description: "The requested knowledge transmission does not exist or has been relocated.",
+        url: `${SITE_URL}/post/${slug}`,
+        locale: "zh_TW",
+        images: [
+          {
+            url: fallbackOgImage,
+            secureUrl: fallbackOgImage,
+            width: 1200,
+            height: 630,
+            type: "image/png",
+            alt: "PostSoma 2050",
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: "Transmission Not Found | PostSoma 2050",
+        description: "The requested knowledge transmission does not exist or has been relocated.",
+        images: [fallbackOgImage],
+      },
+    };
+  }
 
   const title = post.name;
   const description = post.summary ?? `Read "${post.name}" on PostSoma 2050.`;
@@ -54,18 +86,29 @@ export async function generateMetadata({
     },
     openGraph: {
       type: "article",
+      siteName: "PostSoma 2050",
       title,
       description,
       url: canonicalUrl,
-      siteName: "PostSoma 2050",
+      locale: "zh_TW",
       publishedTime: post.publishedDate ?? undefined,
       tags: post.tags.length > 0 ? post.tags : undefined,
       images: [
         {
           url: ogImage,
+          secureUrl: ogImage,
           width: 1200,
           height: 630,
+          type: "image/png",
           alt: title,
+        },
+        {
+          url: fallbackOgImage,
+          secureUrl: fallbackOgImage,
+          width: 1200,
+          height: 630,
+          type: "image/png",
+          alt: "PostSoma 2050",
         },
       ],
     },
@@ -73,7 +116,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title,
       description,
-      images: [ogImage],
+      images: [ogImage, fallbackOgImage],
     },
   };
 }

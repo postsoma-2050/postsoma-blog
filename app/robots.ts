@@ -7,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: "/",
+        allow: ["/", "/api/og", "/api/image"],
         disallow: ["/api/", "/_next/"],
       },
       {
@@ -22,8 +22,14 @@ export default function robots(): MetadataRoute.Robots {
           "Bytespider",
           "CCBot",
           "Diffbot",
+          "Twitterbot",
+          "facebookexternalhit",
+          "LinkedInBot",
+          "TelegramBot",
+          "WhatsApp",
+          "Discordbot",
         ],
-        allow: "/",
+        allow: ["/", "/api/og", "/api/image"],
         disallow: ["/api/", "/_next/"],
       },
     ],

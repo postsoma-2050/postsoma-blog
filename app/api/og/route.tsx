@@ -4,6 +4,27 @@ import fs from "fs";
 import path from "path";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+async function serveFallbackOgImage(): Promise<Response> {
+  try {
+    const filePath = path.join(process.cwd(), "public", "og-image.png");
+    if (fs.existsSync(filePath)) {
+      const fileBuffer = fs.readFileSync(filePath);
+      return new Response(fileBuffer, {
+        status: 200,
+        headers: {
+          "Content-Type": "image/png",
+          "Cache-Control": "public, max-age=31536000, s-maxage=31536000, immutable",
+        },
+      });
+    }
+  } catch (err) {
+    console.warn("⚠️ Failed reading og-image.png from filesystem:", err);
+  }
+
+  return Response.redirect("https://www.postsoma-2050.com/og-image.png", 307);
+}
 
 // Category color mapping
 const CATEGORY_COLORS: Record<string, { bg: string; text: string; border: string }> = {
@@ -29,17 +50,7 @@ export async function GET(req: NextRequest) {
 
     // If no cover image provided, immediately serve the 1200x630 Master Artwork
     if (!cover) {
-      const filePath = path.join(process.cwd(), "public", "og-image.png");
-      if (fs.existsSync(filePath)) {
-        const fileBuffer = fs.readFileSync(filePath);
-        return new Response(fileBuffer, {
-          status: 200,
-          headers: {
-            "Content-Type": "image/png",
-            "Cache-Control": "public, max-age=31536000, s-maxage=31536000, immutable",
-          },
-        });
-      }
+      return await serveFallbackOgImage();
     }
 
     const catStyle = CATEGORY_COLORS[category] || {
@@ -546,18 +557,7 @@ export async function GET(req: NextRequest) {
     );
   } catch (e: any) {
     console.error("Failed to generate dynamic OG image:", e);
-    // Fallback: return static og-image.png
-    const filePath = path.join(process.cwd(), "public", "og-image.png");
-    if (fs.existsSync(filePath)) {
-      const fileBuffer = fs.readFileSync(filePath);
-      return new Response(fileBuffer, {
-        status: 200,
-        headers: {
-          "Content-Type": "image/png",
-          "Cache-Control": "public, max-age=86400",
-        },
-      });
-    }
-    return new Response("Error generating image", { status: 500 });
+    // Fallback: guaranteed static master artwork
+    return await serveFallbackOgImage();
   }
 }
