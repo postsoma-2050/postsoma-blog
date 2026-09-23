@@ -33,18 +33,18 @@ export const metadata: Metadata = {
     "High-Tech meets High-Touch. AI, Blockchain, Philosophy, Investing, Notes.",
   icons: {
     icon: [
-      // PNG entries first — Safari picks these up reliably (ignores ICO with sizes="any")
-      { url: "/favicon-16x16.png?v=4", type: "image/png", sizes: "16x16" },
-      { url: "/favicon-32x32.png?v=4", type: "image/png", sizes: "32x32" },
-      { url: "/favicon.png?v=4",       type: "image/png", sizes: "192x192" },
-      // ICO as fallback for legacy browsers — placed last so Safari skips it
-      { url: "/favicon.ico?v=4", sizes: "48x48" },
+      { url: "/favicon.svg?v=5",       type: "image/svg+xml" },
+      { url: "/favicon-16x16.png?v=5", type: "image/png", sizes: "16x16" },
+      { url: "/favicon-32x32.png?v=5", type: "image/png", sizes: "32x32" },
+      { url: "/favicon.png?v=5",       type: "image/png", sizes: "192x192" },
+      { url: "/favicon.ico?v=5", sizes: "48x48" },
     ],
-    shortcut: ["/favicon-32x32.png?v=4"],
+    shortcut: ["/favicon-32x32.png?v=5"],
     apple: [
-      { url: "/apple-touch-icon.png?v=4", sizes: "180x180", type: "image/png" },
+      { url: "/apple-touch-icon.png?v=5", sizes: "180x180", type: "image/png" },
     ],
   },
+  manifest: "/site.webmanifest",
   openGraph: {
     type: "website",
     siteName: "PostSoma 2050",

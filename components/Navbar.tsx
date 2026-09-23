@@ -36,13 +36,13 @@ export default function Navbar() {
           className="group flex items-center gap-2.5 sm:gap-3 transition-all focus:outline-none focus:ring-2 focus:ring-[var(--border-default)] rounded-lg"
           aria-label="PostSoma 2050 home"
         >
-          <div className="relative flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center overflow-hidden rounded-lg border-[0.5px] border-[var(--border-subtle)] bg-[var(--bg-surface)] p-0.5 transition-all duration-200 group-hover:border-[var(--border-default)] shadow-sm">
+          <div className="relative flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center transition-transform duration-200 group-hover:scale-105">
             <Image
               src="/logo.png"
-              alt="PostSoma Icon"
+              alt="PostSoma Emblem"
               width={36}
               height={36}
-              className="h-full w-full object-contain"
+              className="h-full w-full object-contain filter drop-shadow-[0_0_8px_rgba(0,240,255,0.3)] transition-all duration-200 group-hover:drop-shadow-[0_0_12px_rgba(0,240,255,0.6)]"
               priority
             />
           </div>
